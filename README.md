@@ -118,5 +118,5 @@ Tüm süreç çıktıları **dönem değerlendirmesi için kayıt altında tutul
 
 ## ✨ Yazarlar & Teşekkür
 
-Bu proje {Üniversite Adı} Yazılım Mühendisliği dersi kapsamında geliştirilmiştir.  
+Bu proje Erciyes Üniversitesi Yazılım Mühendisliği dersi kapsamında geliştirilmiştir.  
 Katkı sağlayan tüm takım üyelerine teşekkürler.
