@@ -11,13 +11,15 @@ class UserRepository:
         return self.db.query(User).filter(User.username == username).first()
 
     def create(self, user: UserCreate):
-        hashed_pw = hash_password(user.password)
+        plain_pw = str(user.password)[:72]  # bcrypt limit safety
+        hashed_pw = hash_password(plain_pw)
         db_user = User(
             username=user.username,
             email=user.email,
             password_hash=hashed_pw,
             role=user.role,
         )
+        print(">>> RECEIVED PASSWORD:", user.password, type(user.password))
         self.db.add(db_user)
         self.db.commit()
         self.db.refresh(db_user)

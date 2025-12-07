@@ -1,0 +1,207 @@
+{
+  "info": {
+    "name": "Sponge Stock API",
+    "description": "Full API collection for Sponge Stock Management System",
+    "_postman_id": "a1b2c3d4-e5f6-7890-abcd-123456789000",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register User",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/users/register",
+              "host": ["{{base_url}}"],
+              "path": ["users", "register"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"admin\",\n  \"email\": \"admin@example.com\",\n  \"password\": \"123456\",\n  \"role\": \"admin\"\n}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "let res = pm.response.json();",
+                  "pm.environment.set(\"token\", res.access_token);",
+                  "console.log(\"TOKEN SET →\", res.access_token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/x-www-form-urlencoded" }
+            ],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                { "key": "username", "value": "admin" },
+                { "key": "password", "value": "123456" }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/users/login",
+              "host": ["{{base_url}}"],
+              "path": ["users", "login"]
+            }
+          }
+        },
+        {
+          "name": "Get Current User",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/users/me",
+              "host": ["{{base_url}}"],
+              "path": ["users", "me"]
+            }
+          }
+        }
+      ]
+    },
+
+    {
+      "name": "Sponges",
+      "item": [
+        {
+          "name": "Get All Sponges",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": "{{base_url}}/sponges/"
+          }
+        },
+        {
+          "name": "Create Sponge",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Soft Sponge\",\n  \"density\": 24,\n  \"hardness\": \"medium\",\n  \"unit\": \"m3\",\n  \"width\": 100,\n  \"height\": 200,\n  \"thickness\": 10,\n  \"critical_stock\": 5\n}"
+            },
+            "url": "{{base_url}}/sponges/"
+          }
+        },
+        {
+          "name": "Get Sponge by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": "{{base_url}}/sponges/1"
+          }
+        }
+      ]
+    },
+
+    {
+      "name": "Stocks",
+      "item": [
+        {
+          "name": "Create Stock Entry",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"sponge_id\": 1,\n  \"quantity\": 10,\n  \"type\": \"in\",\n  \"note\": \"Initial stock\"\n}"
+            },
+            "url": "{{base_url}}/stocks/"
+          }
+        },
+        {
+          "name": "List Stocks",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": "{{base_url}}/stocks/"
+          }
+        },
+        {
+          "name": "Stock Summary",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": "{{base_url}}/stocks/summary"
+          }
+        }
+      ]
+    },
+
+    {
+      "name": "Reports",
+      "item": [
+        {
+          "name": "Weekly Report",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": "{{base_url}}/reports/weekly"
+          }
+        },
+        {
+          "name": "Monthly Report",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": "{{base_url}}/reports/monthly"
+          }
+        },
+        {
+          "name": "Critical Stock Alert",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": "{{base_url}}/reports/critical?notify=false"
+          }
+        }
+      ]
+    }
+  ],
+
+  "event": [],
+  "variable": [
+    { "key": "base_url", "value": "http://localhost:8000" },
+    { "key": "token", "value": "" }
+  ]
+}

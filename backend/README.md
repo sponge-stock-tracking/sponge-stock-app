@@ -168,3 +168,9 @@ POST /stocks/
 ```
 
 ---
+
+## API Testing (Postman)
+
+Postman koleksiyonunu yükleyerek API'yi test edebilirsiniz:
+
+`docs/sponge-stock.postman_collection.json`

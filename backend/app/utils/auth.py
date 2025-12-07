@@ -16,7 +16,7 @@ ALGORITHM = settings.ALGORITHM
 ACCESS_TOKEN_EXPIRE_MINUTES = settings.ACCESS_TOKEN_EXPIRE_MINUTES
 
 # OAuth2 setup
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="users/login")
 
 # Şifreleme context'i
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
