@@ -3,13 +3,14 @@ from pydantic import Field
 
 class Settings(BaseSettings):
     # Database
-    POSTGRES_USER: str = Field(..., env="POSTGRES_USER")
-    POSTGRES_PASSWORD: str = Field(..., env="POSTGRES_PASSWORD")
-    POSTGRES_DB: str = Field(..., env="POSTGRES_DB")
-    POSTGRES_HOST: str = Field(..., env="POSTGRES_HOST")
-    POSTGRES_PORT: str = Field(..., env="POSTGRES_PORT")
-
     DATABASE_URL: str = Field(..., env="DATABASE_URL")
+
+    # OPTIONAL — Supabase kullanıyorsan bunlar gereksiz
+    POSTGRES_USER: str | None = Field(None, env="POSTGRES_USER")
+    POSTGRES_PASSWORD: str | None = Field(None, env="POSTGRES_PASSWORD")
+    POSTGRES_DB: str | None = Field(None, env="POSTGRES_DB")
+    POSTGRES_HOST: str | None = Field(None, env="POSTGRES_HOST")
+    POSTGRES_PORT: str | None = Field(None, env="POSTGRES_PORT")
 
     # Auth
     SECRET_KEY: str = Field(..., env="SECRET_KEY")
@@ -35,6 +36,6 @@ class Settings(BaseSettings):
 
     class Config:
         env_file = ".env"
-        extra = "allow"  # <<< BU SATIR KRİTİK — fazla key'ler hata vermesin
+        extra = "allow"
 
 settings = Settings()
