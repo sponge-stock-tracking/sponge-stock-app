@@ -1,31 +1,44 @@
-# app/repositories/sponge_repository.py
 from sqlalchemy.orm import Session
-from app.models.sponge import Sponge
+from sqlalchemy.exc import IntegrityError
+from app.models.sponges import Sponge
 from app.schemas.sponge_schema import SpongeCreate
 
-def get_all(db: Session):
-    return db.query(Sponge).all()
+class SpongeRepository:
+    def __init__(self, db: Session):
+        self.db = db
 
-def create(db: Session, sponge: SpongeCreate):
-    db_sponge = Sponge(**sponge.dict())
-    db.add(db_sponge)
-    db.commit()
-    db.refresh(db_sponge)
-    return db_sponge
+    def get_all(self):
+        return self.db.query(Sponge).all()
 
-def get_by_id(db: Session, sponge_id: int):
-    return db.query(Sponge).filter(Sponge.id == sponge_id).first()  
-def delete(db: Session, sponge_id: int):
-    db_sponge = db.query(Sponge).filter(Sponge.id == sponge_id).first()
-    if db_sponge:
-        db.delete(db_sponge)
-        db.commit()
-    return db_sponge
-def update(db: Session, sponge_id: int, sponge: SpongeCreate):  
-    db_sponge = db.query(Sponge).filter(Sponge.id == sponge_id).first()
-    if db_sponge:
+    def get_by_id(self, sponge_id: int):
+        return self.db.query(Sponge).filter(Sponge.id == sponge_id).first()
+
+    def create(self, sponge: SpongeCreate):
+        try:
+            obj = Sponge(**sponge.dict())
+            self.db.add(obj)
+            self.db.commit()
+            self.db.refresh(obj)
+            return obj
+        except IntegrityError:
+            self.db.rollback()
+            raise ValueError("Bu sünger zaten kayıtlı veya veri hatalı.")
+
+    def update(self, sponge_id: int, sponge: SpongeCreate):
+        obj = self.get_by_id(sponge_id)
+        if not obj:
+            return None
         for key, value in sponge.dict().items():
-            setattr(db_sponge, key, value)
-        db.commit()
-        db.refresh(db_sponge)
-    return db_sponge
+            if value is not None:
+                setattr(obj, key, value)
+        self.db.commit()
+        self.db.refresh(obj)
+        return obj
+
+    def delete(self, sponge_id: int):
+        obj = self.get_by_id(sponge_id)
+        if not obj:
+            return None
+        self.db.delete(obj)
+        self.db.commit()
+        return obj
