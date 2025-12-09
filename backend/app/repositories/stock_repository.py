@@ -1,7 +1,9 @@
 from sqlalchemy.orm import Session
 from app.models.stocks import Stock, StockType
+from app.models.sponges import Sponge
 from app.schemas.stock_schema import StockCreate
 from sqlalchemy import func
+from datetime import datetime
 
 class StockRepository:
     def __init__(self, db: Session):
@@ -49,9 +51,50 @@ class StockRepository:
         return total
 
     def get_summary(self):
-        # Raporlama için doldurulacak
-        pass
+        """
+        Her sünger için toplam giriş, çıkış, iade ve mevcut stok bilgisini döner.
+        """
+        sponges = self.db.query(Sponge).all()
+        
+        result = []
+        for sponge in sponges:
+            stocks = self.db.query(Stock).filter(Stock.sponge_id == sponge.id).all()
+            
+            total_in = sum(s.quantity for s in stocks if s.type == StockType.in_)
+            total_out = sum(s.quantity for s in stocks if s.type == StockType.out)
+            total_return = sum(s.quantity for s in stocks if s.type == StockType.return_)
+            
+            current_stock = total_in + total_return - total_out
+            
+            result.append({
+                "sponge_id": sponge.id,
+                "name": sponge.name,
+                "total_in": total_in,
+                "total_out": total_out,
+                "total_return": total_return,
+                "current_stock": current_stock,
+                "critical_stock": sponge.critical_stock
+            })
+        
+        return result
 
-    def get_by_date_range(self, start, end):
-        # Raporlama için doldurulacak
-        pass
+    def get_by_date_range(self, start: str, end: str):
+        """
+        Belirtilen tarih aralığındaki stok hareketlerini döner.
+        start ve end formatı: YYYY-MM-DD
+        """
+        try:
+            start_date = datetime.strptime(start, "%Y-%m-%d")
+            end_date = datetime.strptime(end, "%Y-%m-%d")
+            # End date'i günün sonuna kadar dahil et
+            end_date = end_date.replace(hour=23, minute=59, second=59)
+        except ValueError:
+            return []
+        
+        return (
+            self.db.query(Stock)
+            .filter(Stock.date >= start_date)
+            .filter(Stock.date <= end_date)
+            .order_by(Stock.date.desc())
+            .all()
+        )

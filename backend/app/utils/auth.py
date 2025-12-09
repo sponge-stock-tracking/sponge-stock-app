@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta, timezone
 import uuid
+import logging
 from jose import jwt, JWTError, ExpiredSignatureError
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
@@ -10,6 +11,9 @@ from app.core.database import get_db
 from app.core.config import settings
 from app.models.users import User
 from app.schemas.users_schema import TokenData, UserRole
+
+# Logger
+logger = logging.getLogger(__name__)
 
 # =========================
 # CONFIG
@@ -41,9 +45,13 @@ def _build_token_payload(*, subject: str, role: UserRole, token_type: str, expir
     now = datetime.now(timezone.utc)
     expire = now + expires_delta
     jti = str(uuid.uuid4())
+    
+    # DÜZELTME: role'ü her zaman .value olarak al
+    role_str = role.value if isinstance(role, UserRole) else role
+    
     payload = {
         "sub": subject,
-        "role": role.value if isinstance(role, UserRole) else str(role),
+        "role": role_str,
         "type": token_type,
         "jti": jti,
         "iat": int(now.timestamp()),
@@ -112,21 +120,48 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
         detail="Invalid authentication credentials",
         headers={"WWW-Authenticate": "Bearer"},
     )
-    payload = decode_token_raw(token)
-    if payload.get("type") != "access":
+    
+    logger.info(f"🔍 Token validation started. Token length: {len(token) if token else 0}")
+    
+    try:
+        payload = decode_token_raw(token)
+        logger.info(f"✅ Token decoded successfully. Payload: {payload}")
+    except HTTPException as e:
+        logger.error(f"❌ Token decode failed: {e.detail}")
+        raise
+    
+    token_type = payload.get("type")
+    if token_type != "access":
+        logger.error(f"❌ Invalid token type: {token_type} (expected: access)")
         raise credentials_error
+    
     username = payload.get("sub")
     role_value = payload.get("role")
     jti = payload.get("jti")
+    
+    logger.info(f"📋 Token data: username={username}, role={role_value}, jti={jti}")
+    
     if not username or not jti:
+        logger.error(f"❌ Missing required fields: username={username}, jti={jti}")
         raise credentials_error
+    
     try:
         role = UserRole(role_value)
-    except Exception:
+        logger.info(f"✅ Role validated: {role}")
+    except Exception as e:
+        logger.error(f"❌ Invalid role value: {role_value}, error: {e}")
         raise credentials_error
+    
     user = db.query(User).filter(User.username == username).first()
-    if not user or not user.is_active:
+    if not user:
+        logger.error(f"❌ User not found: {username}")
         raise credentials_error
+    
+    if not user.is_active:
+        logger.error(f"❌ User inactive: {username}")
+        raise credentials_error
+    
+    logger.info(f"✅ User authenticated successfully: {username} (id={user.id}, role={user.role})")
     return user
 
 def get_current_admin(current_user: User = Depends(get_current_user)) -> User:
