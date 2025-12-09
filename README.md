@@ -109,10 +109,50 @@ Tüm süreç çıktıları **dönem değerlendirmesi için kayıt altında tutul
 ## ✅ Durum
 
 ✔ Repo oluşturuldu  
-◻ Sprint 0 görev atamaları  
-◻ Dokümantasyon başlangıcı  
-◻ Use Case & ERD taslakları  
-◻ Fizibilite raporu tamamlanacak
+✔ Backend ve Frontend geliştirmeleri tamamlandı  
+✔ Docker yapılandırmaları hazır  
+✔ Test senaryoları yazıldı  
+✔ Deployment konfigürasyonları hazırlandı
+
+---
+
+## 🚀 Deployment (Dağıtım)
+
+Bu proje **tamamen ücretsiz** bulut servisleri kullanılarak canlıya alınabilir:
+
+### Mimari
+
+```
+Frontend (Vercel) → Backend (Render) → Veritabanı (Supabase)
+   Next.js            FastAPI            PostgreSQL
+   ÜCRETSİZ          ÜCRETSİZ            ÜCRETSİZ
+```
+
+### Toplam Maliyet: **0₺/ay** 🎉
+
+### Deployment Rehberleri (Türkçe)
+
+1. **[DEPLOYMENT_TR.md](DEPLOYMENT_TR.md)** - Hızlı deployment referansı
+2. **[SUPABASE_KURULUM.md](SUPABASE_KURULUM.md)** - Veritabanı kurulumu
+3. **[RENDER_DEPLOYMENT_TR.md](RENDER_DEPLOYMENT_TR.md)** - Backend deployment
+4. **[VERCEL_DEPLOYMENT_TR.md](VERCEL_DEPLOYMENT_TR.md)** - Frontend deployment
+
+### Önemli Dosyalar
+
+- `render.yaml` - Render.com otomatik deployment yapılandırması
+- `backend/Dockerfile` - Production backend container
+- `frontend/Dockerfile` - Production frontend container
+- `backend/.env.example` - Ortam değişkenleri şablonu
+- `deploy-prepare.sh` - SECRET_KEY oluşturma yardımcı script
+
+### Deployment Sırası
+
+1. **Supabase** - PostgreSQL veritabanı oluştur
+2. **Render** - Backend API'yi deploy et
+3. **Vercel** - Frontend'i deploy et
+4. Migration'ları çalıştır ve test et
+
+Detaylı adımlar için deployment rehberlerine bakın.
 
 ---
 

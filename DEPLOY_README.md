@@ -21,6 +21,7 @@
 Follow these steps in order:
 
 ### 1️⃣ Database Setup (Supabase)
+
 📖 **Guide:** [SUPABASE_SETUP.md](SUPABASE_SETUP.md)
 
 ```bash
@@ -34,6 +35,7 @@ Follow these steps in order:
 ---
 
 ### 2️⃣ Backend Deployment (Render)
+
 📖 **Guide:** [DEPLOYMENT.md](DEPLOYMENT.md)
 
 ```bash
@@ -49,6 +51,7 @@ Follow these steps in order:
 ---
 
 ### 3️⃣ Frontend Deployment (Vercel)
+
 📖 **Guide:** [VERCEL_DEPLOYMENT.md](VERCEL_DEPLOYMENT.md)
 
 ```bash
@@ -101,10 +104,13 @@ NEXT_PUBLIC_API_URL=https://sponge-stock-backend.onrender.com
 ## 🛠️ Helper Scripts
 
 ### Generate Environment Variables
+
 ```bash
 ./deploy-prepare.sh
 ```
+
 This will:
+
 - Generate SECRET_KEY
 - Check Docker files
 - Show all required environment variables
@@ -114,21 +120,21 @@ This will:
 
 ## 📚 Detailed Guides
 
-| Component | Platform | Guide | Status |
-|-----------|----------|-------|--------|
-| Database | Supabase | [SUPABASE_SETUP.md](SUPABASE_SETUP.md) | ✅ Ready |
-| Backend | Render | [DEPLOYMENT.md](DEPLOYMENT.md) | ✅ Ready |
-| Frontend | Vercel | [VERCEL_DEPLOYMENT.md](VERCEL_DEPLOYMENT.md) | ✅ Ready |
+| Component | Platform | Guide                                        | Status   |
+| --------- | -------- | -------------------------------------------- | -------- |
+| Database  | Supabase | [SUPABASE_SETUP.md](SUPABASE_SETUP.md)       | ✅ Ready |
+| Backend   | Render   | [DEPLOYMENT.md](DEPLOYMENT.md)               | ✅ Ready |
+| Frontend  | Vercel   | [VERCEL_DEPLOYMENT.md](VERCEL_DEPLOYMENT.md) | ✅ Ready |
 
 ---
 
 ## 💰 Cost Breakdown
 
-| Service | Free Tier | Limits |
-|---------|-----------|--------|
-| **Supabase** | ✅ Free Forever | 500MB DB, 2GB bandwidth |
-| **Render** | ✅ Free 750h/month | 512MB RAM, sleeps after 15min |
-| **Vercel** | ✅ Free Forever | Unlimited for hobby projects |
+| Service      | Free Tier          | Limits                        |
+| ------------ | ------------------ | ----------------------------- |
+| **Supabase** | ✅ Free Forever    | 500MB DB, 2GB bandwidth       |
+| **Render**   | ✅ Free 750h/month | 512MB RAM, sleeps after 15min |
+| **Vercel**   | ✅ Free Forever    | Unlimited for hobby projects  |
 
 **Total Monthly Cost: $0** 🎉
 
@@ -139,18 +145,21 @@ This will:
 After deploying all components:
 
 1. **Backend Health Check:**
+
    ```
    https://sponge-stock-backend.onrender.com/
    Expected: {"message": "Welcome to the Sponge Stock Management API!"}
    ```
 
 2. **API Documentation:**
+
    ```
    https://sponge-stock-backend.onrender.com/docs
    Expected: Interactive Swagger UI
    ```
 
 3. **Frontend:**
+
    ```
    https://sponge-stock-app.vercel.app
    Expected: Login page loads
@@ -166,6 +175,7 @@ After deploying all components:
 ## 🐛 Common Issues & Solutions
 
 ### 1. Backend can't connect to database
+
 ```
 ❌ Error: could not connect to server
 ✅ Solution: Check DATABASE_URL uses pooler port (6543)
@@ -173,6 +183,7 @@ After deploying all components:
 ```
 
 ### 2. Frontend shows blank page
+
 ```
 ❌ Error: Network error or CORS issue
 ✅ Solution: Check NEXT_PUBLIC_API_URL in Vercel
@@ -180,6 +191,7 @@ After deploying all components:
 ```
 
 ### 3. Backend takes forever to respond
+
 ```
 ❌ Error: Timeout or very slow response
 ✅ Solution: Render free tier sleeps after 15min inactivity
@@ -188,6 +200,7 @@ After deploying all components:
 ```
 
 ### 4. Migrations fail
+
 ```
 ❌ Error: alembic upgrade head fails
 ✅ Solution: Use direct connection (port 5432) for migrations
@@ -199,11 +212,13 @@ After deploying all components:
 ## 📞 Getting Help
 
 1. **Check logs:**
+
    - Render: Service → Logs tab
    - Vercel: Deployment → Function Logs
    - Supabase: Dashboard → Database → Logs
 
 2. **Documentation:**
+
    - Each platform has detailed docs linked in guides
    - Check project README.md
 
@@ -229,7 +244,7 @@ DATABASE (Supabase):
 [ ] Using pooler URL (port 6543)
 
 BACKEND (Render):
-[ ] Account created  
+[ ] Account created
 [ ] Web service created
 [ ] All environment variables added
 [ ] Deployment successful
@@ -280,4 +295,4 @@ After successful deployment:
 
 **Good luck with your deployment! 🚀**
 
-*Last updated: December 2025*
+_Last updated: December 2025_
