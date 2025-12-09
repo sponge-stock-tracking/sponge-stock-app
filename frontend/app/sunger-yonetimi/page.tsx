@@ -29,124 +29,161 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { initializeDemoData, getSungerTurleri, saveSungerTuru, deleteSungerTuru } from "@/lib/storage"
-import type { SungerTuru } from "@/lib/types"
-import { ArrowLeft, Plus, Pencil, Trash2, CheckCircle } from "lucide-react"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { getSponges, createSponge, updateSponge, deleteSponge } from "@/api/sponges"
+import type { Sponge, SpongeHardness, SpongeUnit } from "@/lib/types"
+import { ArrowLeft, Plus, Pencil, Trash2, CheckCircle, Loader2 } from "lucide-react"
 import { useRouter } from "next/navigation"
+import { toast } from "sonner"
 
 export default function SungerYonetimiPage() {
-  const [sungerler, setSungerler] = useState<SungerTuru[]>([])
+  const [sungerler, setSungerler] = useState<Sponge[]>([])
   const [isDialogOpen, setIsDialogOpen] = useState(false)
-  const [editingSunger, setEditingSunger] = useState<SungerTuru | null>(null)
+  const [editingSunger, setEditingSunger] = useState<Sponge | null>(null)
   const [formData, setFormData] = useState({
-    ad: "",
-    sku: "",
-    birim: "adet",
-    kritikStok: "",
-    dansite: "",
-    sertlik: "",
-    olcu: "",
+    name: "",
+    density: "",
+    hardness: "medium" as SpongeHardness,
+    unit: "m3" as SpongeUnit,
+    width: "",
+    height: "",
+    thickness: "",
+    critical_stock: "",
   })
   const [error, setError] = useState("")
-  const [success, setSuccess] = useState(false)
+  const [loading, setLoading] = useState(true)
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
-  const [sungerToDelete, setSungerToDelete] = useState<string | null>(null)
+  const [sungerToDelete, setSungerToDelete] = useState<number | null>(null)
   const router = useRouter()
 
   useEffect(() => {
-    initializeDemoData()
     loadSungerler()
   }, [])
 
-  const loadSungerler = () => {
-    setSungerler(getSungerTurleri())
+  const loadSungerler = async () => {
+    try {
+      setLoading(true)
+      const data = await getSponges()
+      setSungerler(data || [])
+    } catch (error) {
+      console.error("Sünger yükleme hatası:", error)
+      toast.error("Süngerler yüklenirken bir hata oluştu")
+    } finally {
+      setLoading(false)
+    }
   }
 
-  const handleOpenDialog = (sunger?: SungerTuru) => {
+  const handleOpenDialog = (sunger?: Sponge) => {
     if (sunger) {
       setEditingSunger(sunger)
       setFormData({
-        ad: sunger.ad,
-        sku: sunger.sku,
-        birim: sunger.birim,
-        kritikStok: sunger.kritikStok.toString(),
-        dansite: sunger.dansite || "",
-        sertlik: sunger.sertlik || "",
-        olcu: sunger.olcu || "",
+        name: sunger.name,
+        density: sunger.density.toString(),
+        hardness: sunger.hardness,
+        unit: sunger.unit,
+        width: sunger.width?.toString() || "",
+        height: sunger.height?.toString() || "",
+        thickness: sunger.thickness?.toString() || "",
+        critical_stock: sunger.critical_stock.toString(),
       })
     } else {
       setEditingSunger(null)
       setFormData({
-        ad: "",
-        sku: "",
-        birim: "adet",
-        kritikStok: "",
-        dansite: "",
-        sertlik: "",
-        olcu: "",
+        name: "",
+        density: "",
+        hardness: "medium",
+        unit: "m3",
+        width: "",
+        height: "",
+        thickness: "",
+        critical_stock: "",
       })
     }
     setError("")
-    setSuccess(false)
     setIsDialogOpen(true)
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError("")
-    setSuccess(false)
 
-    if (!formData.ad || !formData.sku || !formData.kritikStok) {
-      setError("Lütfen zorunlu alanları doldurun (Ad, SKU, Kritik Stok)")
+    if (!formData.name || !formData.density || !formData.critical_stock) {
+      setError("Lütfen zorunlu alanları doldurun (Ad, Dansite, Kritik Stok)")
       return
     }
 
-    const kritikStokNum = Number.parseInt(formData.kritikStok)
-    if (isNaN(kritikStokNum) || kritikStokNum <= 0) {
+    const densityNum = Number.parseFloat(formData.density)
+    if (isNaN(densityNum) || densityNum <= 0 || densityNum >= 100) {
+      setError("Dansite 0-100 arasında olmalı")
+      return
+    }
+
+    const criticalStockNum = Number.parseFloat(formData.critical_stock)
+    if (isNaN(criticalStockNum) || criticalStockNum < 0) {
       setError("Geçerli bir kritik stok değeri girin")
       return
     }
 
-    const sunger: SungerTuru = {
-      id: editingSunger?.id || Date.now().toString(),
-      ad: formData.ad,
-      sku: formData.sku,
-      birim: formData.birim,
-      kritikStok: kritikStokNum,
-      dansite: formData.dansite || undefined,
-      sertlik: formData.sertlik || undefined,
-      olcu: formData.olcu || undefined,
-    }
+    try {
+      setIsSubmitting(true)
+      
+      const spongeData = {
+        name: formData.name,
+        density: densityNum,
+        hardness: formData.hardness,
+        unit: formData.unit,
+        width: formData.width ? Number.parseFloat(formData.width) : undefined,
+        height: formData.height ? Number.parseFloat(formData.height) : undefined,
+        thickness: formData.thickness ? Number.parseFloat(formData.thickness) : undefined,
+        critical_stock: criticalStockNum,
+      }
 
-    saveSungerTuru(sunger)
-    loadSungerler()
-    setSuccess(true)
+      if (editingSunger) {
+        await updateSponge(editingSunger.id, spongeData)
+        toast.success("Sünger türü güncellendi!")
+      } else {
+        await createSponge(spongeData)
+        toast.success("Sünger türü eklendi!")
+      }
 
-    setTimeout(() => {
+      await loadSungerler()
       setIsDialogOpen(false)
       setFormData({
-        ad: "",
-        sku: "",
-        birim: "adet",
-        kritikStok: "",
-        dansite: "",
-        sertlik: "",
-        olcu: "",
+        name: "",
+        density: "",
+        hardness: "medium",
+        unit: "m3",
+        width: "",
+        height: "",
+        thickness: "",
+        critical_stock: "",
       })
       setEditingSunger(null)
-    }, 1000)
+    } catch (error: any) {
+      console.error("Sünger kaydetme hatası:", error)
+      setError(error.response?.data?.detail || "Sünger kaydedilirken bir hata oluştu")
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
-  const handleDeleteClick = (id: string) => {
+  const handleDeleteClick = (id: number) => {
     setSungerToDelete(id)
     setDeleteDialogOpen(true)
   }
 
-  const handleDeleteConfirm = () => {
+  const handleDeleteConfirm = async () => {
     if (sungerToDelete) {
-      deleteSungerTuru(sungerToDelete)
-      loadSungerler()
-      setSungerToDelete(null)
+      try {
+        await deleteSponge(sungerToDelete)
+        toast.success("Sünger türü silindi!")
+        await loadSungerler()
+        setSungerToDelete(null)
+      } catch (error: any) {
+        console.error("Sünger silme hatası:", error)
+        toast.error(error.response?.data?.detail || "Sünger silinirken bir hata oluştu")
+      }
     }
     setDeleteDialogOpen(false)
   }
@@ -183,84 +220,131 @@ export default function SungerYonetimiPage() {
                 <form onSubmit={handleSubmit} className="space-y-4">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label htmlFor="ad">
+                      <Label htmlFor="name">
                         Sünger Adı <span className="text-destructive">*</span>
                       </Label>
                       <Input
-                        id="ad"
-                        placeholder="Örn: Yüksek Yoğunluklu Sünger 5cm"
-                        value={formData.ad}
-                        onChange={(e) => setFormData({ ...formData, ad: e.target.value })}
+                        id="name"
+                        placeholder="Örn: Yüksek Yoğunluklu Sünger"
+                        value={formData.name}
+                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                        disabled={isSubmitting}
                       />
                     </div>
 
                     <div className="space-y-2">
-                      <Label htmlFor="sku">
-                        SKU Kodu <span className="text-destructive">*</span>
+                      <Label htmlFor="density">
+                        Dansite (kg/m³) <span className="text-destructive">*</span>
                       </Label>
                       <Input
-                        id="sku"
-                        placeholder="Örn: YYS-5CM-001"
-                        value={formData.sku}
-                        onChange={(e) => setFormData({ ...formData, sku: e.target.value })}
+                        id="density"
+                        type="number"
+                        step="0.1"
+                        min="0.1"
+                        max="99.9"
+                        placeholder="Örn: 35"
+                        value={formData.density}
+                        onChange={(e) => setFormData({ ...formData, density: e.target.value })}
+                        disabled={isSubmitting}
                       />
                     </div>
 
                     <div className="space-y-2">
-                      <Label htmlFor="birim">
+                      <Label htmlFor="hardness">
+                        Sertlik <span className="text-destructive">*</span>
+                      </Label>
+                      <Select 
+                        value={formData.hardness} 
+                        onValueChange={(value) => setFormData({ ...formData, hardness: value as SpongeHardness })}
+                        disabled={isSubmitting}
+                      >
+                        <SelectTrigger id="hardness">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="soft">Yumuşak</SelectItem>
+                          <SelectItem value="medium">Orta</SelectItem>
+                          <SelectItem value="hard">Sert</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="unit">
                         Birim <span className="text-destructive">*</span>
                       </Label>
+                      <Select 
+                        value={formData.unit} 
+                        onValueChange={(value) => setFormData({ ...formData, unit: value as SpongeUnit })}
+                        disabled={isSubmitting}
+                      >
+                        <SelectTrigger id="unit">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="m3">m³</SelectItem>
+                          <SelectItem value="adet">Adet</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="width">Genişlik (cm)</Label>
                       <Input
-                        id="birim"
-                        placeholder="Örn: adet, kg, m²"
-                        value={formData.birim}
-                        onChange={(e) => setFormData({ ...formData, birim: e.target.value })}
+                        id="width"
+                        type="number"
+                        step="0.1"
+                        min="0.1"
+                        placeholder="Örn: 200"
+                        value={formData.width}
+                        onChange={(e) => setFormData({ ...formData, width: e.target.value })}
+                        disabled={isSubmitting}
                       />
                     </div>
 
                     <div className="space-y-2">
-                      <Label htmlFor="kritikStok">
+                      <Label htmlFor="height">Yükseklik (cm)</Label>
+                      <Input
+                        id="height"
+                        type="number"
+                        step="0.1"
+                        min="0.1"
+                        placeholder="Örn: 100"
+                        value={formData.height}
+                        onChange={(e) => setFormData({ ...formData, height: e.target.value })}
+                        disabled={isSubmitting}
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="thickness">Kalınlık (cm)</Label>
+                      <Input
+                        id="thickness"
+                        type="number"
+                        step="0.1"
+                        min="0.1"
+                        placeholder="Örn: 5"
+                        value={formData.thickness}
+                        onChange={(e) => setFormData({ ...formData, thickness: e.target.value })}
+                        disabled={isSubmitting}
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="critical_stock">
                         Kritik Stok Seviyesi <span className="text-destructive">*</span>
                       </Label>
                       <Input
-                        id="kritikStok"
+                        id="critical_stock"
                         type="number"
-                        min="1"
+                        step="0.1"
+                        min="0"
                         placeholder="Örn: 50"
-                        value={formData.kritikStok}
-                        onChange={(e) => setFormData({ ...formData, kritikStok: e.target.value })}
+                        value={formData.critical_stock}
+                        onChange={(e) => setFormData({ ...formData, critical_stock: e.target.value })}
+                        disabled={isSubmitting}
                       />
                     </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="dansite">Dansite</Label>
-                      <Input
-                        id="dansite"
-                        placeholder="Örn: 35 kg/m³"
-                        value={formData.dansite}
-                        onChange={(e) => setFormData({ ...formData, dansite: e.target.value })}
-                      />
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="sertlik">Sertlik</Label>
-                      <Input
-                        id="sertlik"
-                        placeholder="Örn: Sert, Orta, Yumuşak"
-                        value={formData.sertlik}
-                        onChange={(e) => setFormData({ ...formData, sertlik: e.target.value })}
-                      />
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="olcu">Ölçü</Label>
-                    <Input
-                      id="olcu"
-                      placeholder="Örn: 200x100x5 cm"
-                      value={formData.olcu}
-                      onChange={(e) => setFormData({ ...formData, olcu: e.target.value })}
-                    />
                   </div>
 
                   {error && (
@@ -269,17 +353,15 @@ export default function SungerYonetimiPage() {
                     </Alert>
                   )}
 
-                  {success && (
-                    <Alert className="bg-green-50 text-green-900 border-green-200">
-                      <CheckCircle className="h-4 w-4" />
-                      <AlertDescription>
-                        {editingSunger ? "Sünger türü güncellendi!" : "Sünger türü eklendi!"}
-                      </AlertDescription>
-                    </Alert>
-                  )}
-
-                  <Button type="submit" className="w-full">
-                    {editingSunger ? "Güncelle" : "Ekle"}
+                  <Button type="submit" className="w-full" disabled={isSubmitting}>
+                    {isSubmitting ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        {editingSunger ? "Güncelleniyor..." : "Ekleniyor..."}
+                      </>
+                    ) : (
+                      editingSunger ? "Güncelle" : "Ekle"
+                    )}
                   </Button>
                 </form>
               </DialogContent>
@@ -292,7 +374,9 @@ export default function SungerYonetimiPage() {
               <CardDescription>Sistemde kayıtlı tüm sünger türleri</CardDescription>
             </CardHeader>
             <CardContent>
-              {sungerler.length === 0 ? (
+              {loading ? (
+                <p className="text-center text-muted-foreground py-8">Yükleniyor...</p>
+              ) : sungerler.length === 0 ? (
                 <p className="text-center text-muted-foreground py-8">Henüz sünger türü eklenmemiş</p>
               ) : (
                 <div className="overflow-x-auto">
@@ -300,37 +384,43 @@ export default function SungerYonetimiPage() {
                     <TableHeader>
                       <TableRow>
                         <TableHead>Sünger Adı</TableHead>
-                        <TableHead>SKU</TableHead>
-                        <TableHead>Birim</TableHead>
                         <TableHead>Dansite</TableHead>
                         <TableHead>Sertlik</TableHead>
-                        <TableHead>Ölçü</TableHead>
+                        <TableHead>Birim</TableHead>
+                        <TableHead>Ölçüler (G×Y×K)</TableHead>
                         <TableHead className="text-right">Kritik Stok</TableHead>
                         <TableHead className="text-right">İşlemler</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {sungerler.map((sunger) => (
-                        <TableRow key={sunger.id}>
-                          <TableCell className="font-medium">{sunger.ad}</TableCell>
-                          <TableCell className="text-muted-foreground">{sunger.sku}</TableCell>
-                          <TableCell>{sunger.birim}</TableCell>
-                          <TableCell className="text-sm">{sunger.dansite || "-"}</TableCell>
-                          <TableCell className="text-sm">{sunger.sertlik || "-"}</TableCell>
-                          <TableCell className="text-sm">{sunger.olcu || "-"}</TableCell>
-                          <TableCell className="text-right">{sunger.kritikStok.toLocaleString("tr-TR")}</TableCell>
-                          <TableCell className="text-right">
-                            <div className="flex justify-end gap-2">
-                              <Button variant="ghost" size="icon" onClick={() => handleOpenDialog(sunger)}>
-                                <Pencil className="h-4 w-4" />
-                              </Button>
-                              <Button variant="ghost" size="icon" onClick={() => handleDeleteClick(sunger.id)}>
-                                <Trash2 className="h-4 w-4 text-destructive" />
-                              </Button>
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      ))}
+                      {sungerler.map((sunger) => {
+                        const hardnessLabel = sunger.hardness === 'soft' ? 'Yumuşak' : sunger.hardness === 'medium' ? 'Orta' : 'Sert'
+                        const dimensions = [sunger.width, sunger.height, sunger.thickness]
+                          .filter(d => d !== null && d !== undefined)
+                          .map(d => `${d}cm`)
+                          .join(' × ') || '-'
+                        
+                        return (
+                          <TableRow key={sunger.id}>
+                            <TableCell className="font-medium">{sunger.name}</TableCell>
+                            <TableCell>{sunger.density} kg/m³</TableCell>
+                            <TableCell>{hardnessLabel}</TableCell>
+                            <TableCell>{sunger.unit}</TableCell>
+                            <TableCell className="text-sm">{dimensions}</TableCell>
+                            <TableCell className="text-right">{sunger.critical_stock.toLocaleString("tr-TR")}</TableCell>
+                            <TableCell className="text-right">
+                              <div className="flex justify-end gap-2">
+                                <Button variant="ghost" size="icon" onClick={() => handleOpenDialog(sunger)}>
+                                  <Pencil className="h-4 w-4" />
+                                </Button>
+                                <Button variant="ghost" size="icon" onClick={() => handleDeleteClick(sunger.id)}>
+                                  <Trash2 className="h-4 w-4 text-destructive" />
+                                </Button>
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        )
+                      })}
                     </TableBody>
                   </Table>
                 </div>

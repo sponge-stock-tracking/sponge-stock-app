@@ -7,46 +7,85 @@ import { StockFilters } from "@/components/stok/stock-filters"
 import { StockTable } from "@/components/stok/stock-table"
 import { StockDetailModal } from "@/components/stok/stock-detail-modal"
 import { Button } from "@/components/ui/button"
-import { initializeDemoData, getStokDurumlari, getSungerTurleri, getSungerHareketleri } from "@/lib/storage"
-import type { StokDurum, SungerTuru, StokHareket } from "@/lib/types"
+import { getSponges } from "@/api/sponges"
+import { getStockSummary, getStockByDate } from "@/api/stocks"
+import type { Sponge, StockSummaryItem, StockMovement } from "@/lib/types"
 import { ArrowLeft, Plus, Minus } from "lucide-react"
 import { useRouter } from "next/navigation"
+import { toast } from "sonner"
 
 export default function StokPage() {
-  const [stokDurumlari, setStokDurumlari] = useState<StokDurum[]>([])
+  const [stokDurumlari, setStokDurumlari] = useState<StockSummaryItem[]>([])
+  const [sungerler, setSungerler] = useState<Sponge[]>([])
   const [searchTerm, setSearchTerm] = useState("")
   const [filterType, setFilterType] = useState("all")
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false)
-  const [selectedSunger, setSelectedSunger] = useState<SungerTuru | null>(null)
-  const [selectedHareketler, setSelectedHareketler] = useState<StokHareket[]>([])
-  const [sungerler, setSungerler] = useState<SungerTuru[]>([])
+  const [selectedSponge, setSelectedSponge] = useState<Sponge | null>(null)
+  const [selectedHareketler, setSelectedHareketler] = useState<StockMovement[]>([])
+  const [loading, setLoading] = useState(true)
   const router = useRouter()
 
   useEffect(() => {
-    initializeDemoData()
-    setStokDurumlari(getStokDurumlari())
-    setSungerler(getSungerTurleri())
+    loadData()
   }, [])
 
+  const loadData = async () => {
+    try {
+      setLoading(true)
+      const [spongeList, summary] = await Promise.all([
+        getSponges(),
+        getStockSummary()
+      ])
+      setSungerler(spongeList || [])
+      setStokDurumlari(summary || [])
+    } catch (error) {
+      console.error("Veri yükleme hatası:", error)
+      toast.error("Veriler yüklenirken bir hata oluştu")
+    } finally {
+      setLoading(false)
+    }
+  }
+
   const filteredStoklar = stokDurumlari.filter((stok) => {
-    const matchesSearch = stok.sungerAd.toLowerCase().includes(searchTerm.toLowerCase())
+    const matchesSearch = stok.name.toLowerCase().includes(searchTerm.toLowerCase())
 
     let matchesFilter = true
     if (filterType === "critical") {
-      matchesFilter = stok.mevcutStok <= stok.kritikStok
+      matchesFilter = stok.current_stock <= stok.critical_stock
     } else if (filterType === "normal") {
-      matchesFilter = stok.mevcutStok > stok.kritikStok
+      matchesFilter = stok.current_stock > stok.critical_stock
     }
 
     return matchesSearch && matchesFilter
   })
 
-  const handleDetailClick = (sungerId: string) => {
-    const sunger = sungerler.find((s) => s.id === sungerId)
-    if (sunger) {
-      setSelectedSunger(sunger)
-      setSelectedHareketler(getSungerHareketleri(sungerId))
-      setIsDetailModalOpen(true)
+  const handleDetailClick = async (spongeId: number) => {
+    const sponge = sungerler.find((s) => s.id === spongeId)
+    if (sponge) {
+      try {
+        setSelectedSponge(sponge)
+        
+        // Son 30 günün hareketlerini çek
+        const endDate = new Date()
+        const startDate = new Date()
+        startDate.setDate(startDate.getDate() - 30)
+        
+        const allMovements = await getStockByDate(
+          startDate.toISOString().split('T')[0],
+          endDate.toISOString().split('T')[0]
+        )
+        
+        // Bu süngere ait hareketleri filtrele
+        const spongeMovements = allMovements?.filter(
+          (m: StockMovement) => m.sponge_id === spongeId
+        ) || []
+        
+        setSelectedHareketler(spongeMovements)
+        setIsDetailModalOpen(true)
+      } catch (error) {
+        console.error("Hareket yükleme hatası:", error)
+        toast.error("Stok hareketleri yüklenirken bir hata oluştu")
+      }
     }
   }
 
@@ -84,25 +123,31 @@ export default function StokPage() {
             onFilterChange={setFilterType}
           />
 
-          <div className="flex items-center justify-between text-sm text-muted-foreground">
-            <p>
-              Toplam <span className="font-semibold text-foreground">{filteredStoklar.length}</span> stok gösteriliyor
-            </p>
-            <p>
-              Kritik stok:{" "}
-              <span className="font-semibold text-orange-600">
-                {filteredStoklar.filter((s) => s.mevcutStok <= s.kritikStok).length}
-              </span>
-            </p>
-          </div>
+          {loading ? (
+            <p className="text-muted-foreground text-center py-8">Yükleniyor...</p>
+          ) : (
+            <>
+              <div className="flex items-center justify-between text-sm text-muted-foreground">
+                <p>
+                  Toplam <span className="font-semibold text-foreground">{filteredStoklar.length}</span> stok gösteriliyor
+                </p>
+                <p>
+                  Kritik stok:{" "}
+                  <span className="font-semibold text-orange-600">
+                    {filteredStoklar.filter((s) => s.current_stock <= s.critical_stock).length}
+                  </span>
+                </p>
+              </div>
 
-          <StockTable stoklar={filteredStoklar} onDetailClick={handleDetailClick} />
+              <StockTable stoklar={filteredStoklar} onDetailClick={handleDetailClick} />
+            </>
+          )}
         </main>
 
         <StockDetailModal
           open={isDetailModalOpen}
           onOpenChange={setIsDetailModalOpen}
-          sunger={selectedSunger}
+          sunger={selectedSponge}
           hareketler={selectedHareketler}
         />
       </div>

@@ -1,40 +1,48 @@
-"use client"
+"use client";
 
-import type React from "react"
-
-import { useState } from "react"
-import { useRouter } from "next/navigation"
-import { useAuth } from "@/context/auth-context"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Package } from "lucide-react"
+import React, { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/context/auth-context";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Package } from "lucide-react";
 
 export default function LoginPage() {
-  const [username, setUsername] = useState("")
-  const [password, setPassword] = useState("")
-  const [error, setError] = useState("")
-  const { login } = useAuth()
-  const router = useRouter()
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    setError("")
+  const { login } = useAuth();
+  const router = useRouter();
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    setError("");
+    setLoading(true);
 
     if (!username || !password) {
-      setError("Lütfen tüm alanları doldurun")
-      return
+      setLoading(false);
+      setError("Lütfen tüm alanları doldurun");
+      return;
     }
 
-    const success = login(username, password)
-    if (success) {
-      router.push("/dashboard")
-    } else {
-      setError("Kullanıcı adı veya şifre hatalı")
+    try {
+      // login() async olduğu için await edilmeli
+      await login(username, password);
+
+      router.push("/dashboard");
+    } catch (err: any) {
+      console.error("Login error:", err);
+      setError("Kullanıcı adı veya şifre hatalı");
+    } finally {
+      setLoading(false);
     }
-  }
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/5 via-background to-accent/5 p-4">
@@ -48,6 +56,7 @@ export default function LoginPage() {
             <CardDescription className="text-base mt-2">Hesabınıza giriş yapın</CardDescription>
           </div>
         </CardHeader>
+
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
@@ -61,6 +70,7 @@ export default function LoginPage() {
                 className="h-11"
               />
             </div>
+
             <div className="space-y-2">
               <Label htmlFor="password">Şifre</Label>
               <Input
@@ -79,8 +89,8 @@ export default function LoginPage() {
               </Alert>
             )}
 
-            <Button type="submit" className="w-full h-11 text-base font-medium">
-              Giriş Yap
+            <Button type="submit" className="w-full h-11 text-base font-medium" disabled={loading}>
+              {loading ? "Giriş yapılıyor..." : "Giriş Yap"}
             </Button>
 
             <div className="text-center text-sm text-muted-foreground pt-2">
@@ -90,5 +100,5 @@ export default function LoginPage() {
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }
