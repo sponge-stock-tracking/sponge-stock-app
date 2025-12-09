@@ -18,7 +18,7 @@ def get_stock(stock_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Stock not found")
     return stock
 
-@router.post("/", response_model=StockResponse)
+@router.post("/", response_model=StockResponse, status_code=201)
 def create_stock(stock: StockCreate, db: Session = Depends(get_db)):
     try:
         return StockService(db).create(stock)
@@ -41,3 +41,15 @@ def get_stocks_by_date(
     db: Session = Depends(get_db),
 ):
     return StockService(db).get_by_date_range(start, end)
+
+@router.get("/{sponge_id}/status")
+def stock_status(sponge_id: int, db: Session = Depends(get_db)):
+    return StockService(db).get_status(sponge_id)
+
+# stock_router.py içinde
+@router.get("/{sponge_id}/total")
+def total_stock(sponge_id: int, db: Session = Depends(get_db)):
+    # DÜZELTME: Repo yerine Service'deki hesaplama metodunu kullanıyoruz
+    # Service katmanında get_total_quantity metodu zaten vardı.
+    total = StockService(db).get_total_quantity(sponge_id)
+    return {"sponge_id": sponge_id, "total": total}

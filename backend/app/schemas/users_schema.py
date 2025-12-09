@@ -21,6 +21,7 @@ class UserCreate(UserBase):
 
 class UserResponse(UserBase):
     id: int
+    is_active: bool = True
 
     class Config:
         from_attributes = True  # Pydantic v2 standardı
@@ -28,8 +29,12 @@ class UserResponse(UserBase):
 
 class Token(BaseModel):
     access_token: str
+    refresh_token: str
     token_type: str = "bearer"
+    expires_in: int  # saniye cinsinden access token süresi
 
 
 class TokenData(BaseModel):
     username: Optional[str] = None
+    role: Optional[UserRole] = None
+    jti: Optional[str] = None
