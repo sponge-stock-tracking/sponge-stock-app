@@ -1,104 +1,128 @@
-"use client";
+"use client"
 
-import React, { useState } from "react";
-import { useRouter } from "next/navigation";
-import { useAuth } from "@/context/auth-context";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Package } from "lucide-react";
+import type React from "react"
+
+import { useState } from "react"
+import { useRouter } from "next/navigation"
+import { useAuth } from "@/context/auth-context"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Alert, AlertDescription } from "@/components/ui/alert"
+import { Package } from "lucide-react"
+
+// Resim dosyanızın yolunu buraya ekleyin.
+// LÜTFEN RESMİ public KLASÖRÜNE TAŞIYIP YOLU BUNA GÖRE DÜZELTİN!
+const BACKGROUND_IMAGE_URL = '/imge.jpg'; // ÖRNEK: Eğer public/imge.jpg ise, '/imge.jpg' yazın.
 
 export default function LoginPage() {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [username, setUsername] = useState("")
+  const [password, setPassword] = useState("")
+  const [error, setError] = useState("")
+  const { login } = useAuth()
+  const router = useRouter()
 
-  const { login } = useAuth();
-  const router = useRouter();
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    setError("");
-    setLoading(true);
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    setError("")
 
     if (!username || !password) {
-      setLoading(false);
-      setError("Lütfen tüm alanları doldurun");
-      return;
+      setError("Lütfen tüm alanları doldurun")
+      return
     }
 
-    try {
-      // login() async olduğu için await edilmeli
-      await login(username, password);
-
-      router.push("/dashboard");
-    } catch (err: any) {
-      console.error("Login error:", err);
-      setError("Kullanıcı adı veya şifre hatalı");
-    } finally {
-      setLoading(false);
+    const success = login(username, password)
+    if (success) {
+      router.push("/dashboard")
+    } else {
+      setError("Kullanıcı adı veya şifre hatalı")
     }
-  };
+  }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/5 via-background to-accent/5 p-4">
-      <Card className="w-full max-w-md shadow-lg">
+    // 1. ANA DİV (ARKA PLAN)
+    // Inline stil ile arka plan resmi eklendi.
+    <div 
+      className="min-h-screen flex items-center justify-center p-4 relative"
+      style={{ 
+        backgroundImage: `url(${BACKGROUND_IMAGE_URL})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundAttachment: 'fixed',
+      }}
+    >
+      
+      {/* 2. OVERLAY (Resmi karartmak ve okunabilirliği artırmak için) */}
+      <div className="absolute inset-0 bg-black/40 dark:bg-black/60 z-0"></div>
+
+      {/* 3. CARD BİLEŞENİ (GLASSMORPHISM EFEKTİ) */}
+      <Card 
+        className="w-full max-w-md shadow-2xl bg-background/5 backdrop-blur-x0.90 border-border/30 dark:bg-background/10 dark:border-border/10 transition-all duration-300 z-10"
+      >
         <CardHeader className="space-y-4 text-center">
-          <div className="mx-auto w-16 h-16 bg-primary rounded-2xl flex items-center justify-center">
-            <Package className="w-8 h-8 text-primary-foreground" />
-          </div>
+         <img 
+            src="/logo.png" 
+            alt="Uygulama Logosu" 
+            className="w-full h-full object-cover" 
+          />
           <div>
-            <CardTitle className="text-2xl font-bold">Sünger Takip Sistemi</CardTitle>
-            <CardDescription className="text-base mt-2">Hesabınıza giriş yapın</CardDescription>
+            <CardTitle className="text-2xl font-bold">İYS Sünger ve Malzemecilik</CardTitle>
+            <CardDescription className="text-primary/40 mt-2 text-lg">Hesabınıza giriş yapın</CardDescription>
           </div>
         </CardHeader>
-
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="username">Kullanıcı Adı</Label>
+              <Label htmlFor="username" className="text-lg">Kullanıcı Adı</Label>
               <Input
                 id="username"
                 type="text"
                 placeholder="Kullanıcı adınızı girin"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                className="h-11"
+                className="h-11 
+                   bg-card/40 
+                   text-foreground/50 
+                   focus:border-primary 
+                   focus:ring-2 
+                   focus:ring-primary/50" 
               />
             </div>
-
             <div className="space-y-2">
-              <Label htmlFor="password">Şifre</Label>
+              <Label htmlFor="password" className="text-lg">Şifre</Label>
               <Input
                 id="password"
                 type="password"
                 placeholder="Şifrenizi girin"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="h-11"
+                className="h-11 
+                   bg-card/40 
+                   text-foreground/50
+                   focus:border-primary 
+                   focus:ring-2 
+                   focus:ring-primary/50" 
               />
+
             </div>
 
             {error && (
-              <Alert variant="destructive">
-                <AlertDescription>{error}</AlertDescription>
-              </Alert>
+             <Alert 
+              variant="destructive"
+              className="bg-destructive/15 backdrop-blur-sm border-destructive/50 transition-all duration-300" 
+             >
+             <AlertDescription>{error}</AlertDescription></Alert>
             )}
 
-            <Button type="submit" className="w-full h-11 text-base font-medium" disabled={loading}>
-              {loading ? "Giriş yapılıyor..." : "Giriş Yap"}
+            <Button type="submit" className="w-full h-11 text-base font-medium">
+              Giriş Yap
             </Button>
 
-            <div className="text-center text-sm text-muted-foreground pt-2">
-              Demo: <span className="font-medium">admin</span> / <span className="font-medium">admin</span>
-            </div>
+           
           </form>
         </CardContent>
       </Card>
     </div>
-  );
+  )
 }
