@@ -20,19 +20,28 @@ services:
         value: 7
       - key: PYTHONUNBUFFERED
         value: 1
+      - key: APP_NAME
+        value: Sponge Stock API
+      - key: APP_ENV
+        value: production
+      - key: LOG_LEVEL
+        value: INFO
+      - key: CORS_ORIGINS
+        value: https://sponge-stock-app.vercel.app,http://localhost:3000
     healthCheckPath: /
     autoDeploy: true
 
-  # Frontend Service (Static Site)
-  - type: web
-    name: sponge-stock-frontend
-    runtime: docker
-    dockerfilePath: ./frontend/Dockerfile
-    dockerContext: ./frontend
-    envVars:
-      - key: NEXT_PUBLIC_API_URL
-        value: https://sponge-stock-backend.onrender.com
-    autoDeploy: true
+  # Frontend Service - DISABLED (Deploy to Vercel instead for free)
+  # Uncomment below if you want to deploy frontend on Render (paid tier required)
+  # - type: web
+  #   name: sponge-stock-frontend
+  #   runtime: docker
+  #   dockerfilePath: ./frontend/Dockerfile
+  #   dockerContext: ./frontend
+  #   envVars:
+  #     - key: NEXT_PUBLIC_API_URL
+  #       value: https://sponge-stock-backend.onrender.com
+  #   autoDeploy: true
 
 databases:
   # PostgreSQL Database
