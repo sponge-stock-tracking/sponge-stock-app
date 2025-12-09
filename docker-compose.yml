@@ -23,7 +23,9 @@ services:
   # For local development, it's recommended to run: npm run dev
   # This container is mainly for production/testing purposes
   frontend:
-    build: ./frontend
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
     container_name: sponge-frontend
     restart: always
     depends_on:

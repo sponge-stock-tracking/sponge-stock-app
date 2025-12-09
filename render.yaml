@@ -1,0 +1,42 @@
+services:
+  # Backend API Service
+  - type: web
+    name: sponge-stock-backend
+    runtime: docker
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: sponge-stock-db
+          property: connectionString
+      - key: SECRET_KEY
+        generateValue: true
+      - key: ALGORITHM
+        value: HS256
+      - key: ACCESS_TOKEN_EXPIRE_MINUTES
+        value: 30
+      - key: REFRESH_TOKEN_EXPIRE_DAYS
+        value: 7
+      - key: PYTHONUNBUFFERED
+        value: 1
+    healthCheckPath: /
+    autoDeploy: true
+
+  # Frontend Service (Static Site)
+  - type: web
+    name: sponge-stock-frontend
+    runtime: docker
+    dockerfilePath: ./frontend/Dockerfile
+    dockerContext: ./frontend
+    envVars:
+      - key: NEXT_PUBLIC_API_URL
+        value: https://sponge-stock-backend.onrender.com
+    autoDeploy: true
+
+databases:
+  # PostgreSQL Database
+  - name: sponge-stock-db
+    databaseName: sponge_stock
+    user: sponge_user
+    ipAllowList: []
