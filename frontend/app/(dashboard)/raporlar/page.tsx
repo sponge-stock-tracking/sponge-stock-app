@@ -1,8 +1,6 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { ProtectedRoute } from "@/components/protected-route"
-import { Navbar } from "@/components/navbar"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -105,16 +103,9 @@ export default function RaporlarPage() {
 
   if (loading) {
     return (
-      <ProtectedRoute>
-        <div className="min-h-screen bg-background">
-          <Navbar />
-          <main className="container mx-auto px-4 py-6">
-            <div className="flex items-center justify-center h-96">
-              <Loader2 className="h-8 w-8 animate-spin text-primary" />
-            </div>
-          </main>
-        </div>
-      </ProtectedRoute>
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
     )
   }
 
@@ -124,11 +115,8 @@ export default function RaporlarPage() {
   const netChange = totalIn - totalOut
 
   return (
-    <ProtectedRoute>
-      <div className="min-h-screen bg-background">
-        <Navbar />
-        <main className="container mx-auto px-4 py-6 space-y-6">
-          <div className="flex items-center justify-between">
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <Button variant="ghost" size="icon" onClick={() => router.push("/dashboard")}>
                 <ArrowLeft className="h-5 w-5" />
@@ -224,11 +212,9 @@ export default function RaporlarPage() {
 
           <SpongeMovementChart data={currentData} />
 
-          {criticalStocks.length > 0 && (
-            <CriticalStockTable criticalStocks={criticalStocks} />
-          )}
-        </main>
-      </div>
-    </ProtectedRoute>
+      {criticalStocks.length > 0 && (
+        <CriticalStockTable criticalStocks={criticalStocks} />
+      )}
+    </div>
   )
 }

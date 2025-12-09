@@ -1,8 +1,6 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { ProtectedRoute } from "@/components/protected-route"
-import { Navbar } from "@/components/navbar"
 import { StockFilters } from "@/components/stok/stock-filters"
 import { StockTable } from "@/components/stok/stock-table"
 import { StockDetailModal } from "@/components/stok/stock-detail-modal"
@@ -90,13 +88,10 @@ export default function StokPage() {
   }
 
   return (
-    <ProtectedRoute>
-      <div className="min-h-screen bg-background">
-        <Navbar />
-        <main className="container mx-auto px-4 py-6 space-y-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <Button variant="ghost" size="icon" onClick={() => router.push("/dashboard")}>
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <Button variant="ghost" size="icon" onClick={() => router.push("/dashboard")}>
                 <ArrowLeft className="h-5 w-5" />
               </Button>
               <div>
@@ -139,18 +134,16 @@ export default function StokPage() {
                 </p>
               </div>
 
-              <StockTable stoklar={filteredStoklar} onDetailClick={handleDetailClick} />
-            </>
-          )}
-        </main>
+          <StockTable stoklar={filteredStoklar} onDetailClick={handleDetailClick} />
+        </>
+      )}
 
-        <StockDetailModal
-          open={isDetailModalOpen}
-          onOpenChange={setIsDetailModalOpen}
-          sunger={selectedSponge}
-          hareketler={selectedHareketler}
-        />
-      </div>
-    </ProtectedRoute>
+      <StockDetailModal
+        open={isDetailModalOpen}
+        onOpenChange={setIsDetailModalOpen}
+        sunger={selectedSponge}
+        hareketler={selectedHareketler}
+      />
+    </div>
   )
 }

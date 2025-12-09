@@ -1,15 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ProtectedRoute } from "@/components/protected-route";
-import { Navbar } from "@/components/navbar";
-import { Footer } from "@/components/footer";
 import { StatsCards } from "@/components/dashboard/stats-cards";
 import { WeeklyChart } from "@/components/dashboard/weekly-chart";
 import { QuickActions } from "@/components/dashboard/quick-actions";
 import { RecentActivities } from "@/components/dashboard/recent-activities";
 import { CriticalStockAlerts } from "@/components/dashboard/critical-stock-alerts";
 import { CriticalStockModal } from "@/components/dashboard/critical-stock-modal";
+import { TopMoversWidget } from "@/components/dashboard/top-movers-widget";
+import { StockCalculator } from "@/components/dashboard/stock-calculator";
 
 import { getStockSummary, getStockByDate } from "@/api/stocks";
 import { getSponges } from "@/api/sponges";
@@ -77,51 +76,56 @@ export default function DashboardPage() {
 
   if (loading) {
     return (
-      <ProtectedRoute>
-        <div className="flex items-center justify-center min-h-screen">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary" />
-        </div>
-      </ProtectedRoute>
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary" />
+      </div>
     );
   }
 
   return (
-    <ProtectedRoute>
-      <div className="min-h-screen bg-background flex flex-col">
-        <Navbar />
-        <main className="container mx-auto px-4 py-8 space-y-8 flex-1">
-          <div className="space-y-2">
-            <h2 className="text-4xl font-bold tracking-tight">Dashboard</h2>
-            <p className="text-muted-foreground text-lg">Stok durumunuza genel bakış</p>
-          </div>
-
-          <StatsCards stokDurumlari={stokDurumlari} hareketler={hareketler} />
-
-          <CriticalStockAlerts
-            stokDurumlari={stokDurumlari}
-            onViewAll={() => setIsCriticalModalOpen(true)}
-          />
-
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div className="lg:col-span-2">
-              <WeeklyChart hareketler={hareketler} />
-            </div>
-            <div>
-              <QuickActions />
-            </div>
-          </div>
-
-          <RecentActivities hareketler={hareketler} sungerler={sungerler} />
-        </main>
-
-        <Footer />
-
-        <CriticalStockModal
-          open={isCriticalModalOpen}
-          onOpenChange={setIsCriticalModalOpen}
-          kritikStoklar={kritikStoklar}
-        />
+    <div className="space-y-8">
+      <div className="space-y-2">
+        <h2 className="text-4xl font-bold tracking-tight">Dashboard</h2>
+        <p className="text-muted-foreground text-lg">Stok durumunuza genel bakış</p>
       </div>
-    </ProtectedRoute>
+
+      <StatsCards stokDurumlari={stokDurumlari} hareketler={hareketler} />
+
+      <CriticalStockAlerts
+        stokDurumlari={stokDurumlari}
+        onViewAll={() => setIsCriticalModalOpen(true)}
+      />
+
+      {/* Üst alan - Haftalık Chart (tam genişlik) */}
+      <div className="w-full">
+        <WeeklyChart hareketler={hareketler} />
+      </div>
+
+      {/* Alt alan - 3 sütunlu grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+        {/* Hızlı İşlemler */}
+        <div>
+          <QuickActions />
+        </div>
+
+        {/* Hesap Makinesi */}
+        <div>
+          <StockCalculator />
+        </div>
+
+        {/* En Aktif Ürünler */}
+        <div>
+          <TopMoversWidget />
+        </div>
+      </div>
+
+      <RecentActivities hareketler={hareketler} sungerler={sungerler} />
+
+      <CriticalStockModal
+        open={isCriticalModalOpen}
+        onOpenChange={setIsCriticalModalOpen}
+        kritikStoklar={kritikStoklar}
+      />
+    </div>
   );
 }

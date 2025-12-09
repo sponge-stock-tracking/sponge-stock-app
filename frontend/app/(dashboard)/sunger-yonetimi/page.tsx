@@ -3,8 +3,6 @@
 import type React from "react"
 
 import { useEffect, useState } from "react"
-import { ProtectedRoute } from "@/components/protected-route"
-import { Navbar } from "@/components/navbar"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -189,11 +187,8 @@ export default function SungerYonetimiPage() {
   }
 
   return (
-    <ProtectedRoute>
-      <div className="min-h-screen bg-background">
-        <Navbar />
-        <main className="container mx-auto px-4 py-6 space-y-6">
-          <div className="flex items-center justify-between">
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <Button variant="ghost" size="icon" onClick={() => router.push("/dashboard")}>
                 <ArrowLeft className="h-5 w-5" />
@@ -449,7 +444,6 @@ export default function SungerYonetimiPage() {
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
-      </div>
-    </ProtectedRoute>
+    </div>
   )
 }

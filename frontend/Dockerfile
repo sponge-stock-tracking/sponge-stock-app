@@ -1,10 +1,24 @@
 # syntax=docker/dockerfile:1
 FROM node:20-alpine
 
+# Install pnpm
+RUN npm install -g pnpm
+
 WORKDIR /app
-COPY package*.json ./
-RUN npm install
+
+# Copy package files
+COPY package.json pnpm-lock.yaml* ./
+
+# Install dependencies with pnpm (no frozen lockfile for dev)
+RUN pnpm install
+
+# Copy application code
 COPY . .
 
-# Dev server (geliştirme için)
-CMD ["npm", "run", "dev"]
+# Expose port
+EXPOSE 3000
+
+# Start development server
+CMD ["pnpm", "run", "dev"]
+
+
