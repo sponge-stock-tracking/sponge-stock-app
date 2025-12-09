@@ -4,7 +4,7 @@ import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from app.main import app
+from app.main import app as fastapi_app
 from app.core.database import Base, get_db
 from app.core.config import settings
 
@@ -95,12 +95,12 @@ def client(db_session):
             # session kapatma işlemi db_session fixture'ında zaten yapıldığı için pass
             pass
 
-    app.dependency_overrides[get_db] = override_get_db
+    fastapi_app.dependency_overrides[get_db] = override_get_db
 
-    test_client = TestClient(app)
+    test_client = TestClient(fastapi_app)
     
     # Test Client'ı test fonksiyonuna sunar
     yield test_client
     
     # Test bittikten sonra bağımlılığı temizle (iyi bir pratik)
-    app.dependency_overrides.clear()
+    fastapi_app.dependency_overrides.clear()

@@ -18,7 +18,7 @@ class SpongeRepository:
 
     def create(self, sponge: SpongeCreate):
         try:
-            obj = Sponge(**sponge.dict())
+            obj = Sponge(**sponge.model_dump())
             self.db.add(obj)
             self.db.commit()
             self.db.refresh(obj)
@@ -32,7 +32,7 @@ class SpongeRepository:
         if not obj:
             return None
 
-        for key, value in sponge.dict().items():
+        for key, value in sponge.model_dump().items():
             if value is not None:
                 setattr(obj, key, value)
 

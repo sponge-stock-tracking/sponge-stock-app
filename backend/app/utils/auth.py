@@ -1,9 +1,6 @@
-# app/utils/auth.py
-
 from datetime import datetime, timedelta, timezone
 import uuid
-from jose import jwt
-from jose.exceptions import JWTError, ExpiredSignatureError, JWTClaimsError 
+from jose import jwt, JWTError, ExpiredSignatureError
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
@@ -14,14 +11,14 @@ from app.core.config import settings
 from app.models.users import User
 from app.schemas.users_schema import TokenData, UserRole
 
-
 # =========================
 # CONFIG
 # =========================
 
 SECRET_KEY = settings.SECRET_KEY
 ALGORITHM = settings.ALGORITHM
-REFRESH_TOKEN_EXPIRE_DAYS = 7   # Refresh token ömrü (testler 7 günü kabul ediyor)
+# DİKKAT: ACCESS_TOKEN_EXPIRE_MINUTES buradan silindi, fonksiyon içinde okunacak.
+REFRESH_TOKEN_EXPIRE_DAYS = 7 
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="users/login")
 
@@ -29,30 +26,21 @@ pwd_context = CryptContext(
     schemes=["bcrypt"],
     deprecated="auto",
     bcrypt__rounds=12,
+    bcrypt__truncate_error=True,
 )
 
-
-# =========================
-# PASSWORD HELPERS
-# =========================
-
+# ... (Password Helpers aynı kalsın) ...
 def hash_password(password: str) -> str:
     return pwd_context.hash(password)
-
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     return pwd_context.verify(plain_password, hashed_password)
 
-
-# =========================
-# INTERNAL PAYLOAD BUILDER
-# =========================
-
+# ... (Internal Payload Builder aynı kalsın) ...
 def _build_token_payload(*, subject: str, role: UserRole, token_type: str, expires_delta: timedelta):
     now = datetime.now(timezone.utc)
     expire = now + expires_delta
     jti = str(uuid.uuid4())
-
     payload = {
         "sub": subject,
         "role": role.value if isinstance(role, UserRole) else str(role),
@@ -64,13 +52,12 @@ def _build_token_payload(*, subject: str, role: UserRole, token_type: str, expir
     }
     return payload, jti, expire
 
-
 # =========================
-# ACCESS TOKEN
+# ACCESS TOKEN (DÜZELTİLDİ)
 # =========================
-
 
 def create_access_token(subject: str, role: UserRole):
+    # DÜZELTME: Ayarı her seferinde canlı oku (Testlerde patch çalışması için)
     expire_minutes = settings.ACCESS_TOKEN_EXPIRE_MINUTES
     
     payload, _, expire = _build_token_payload(
@@ -87,7 +74,9 @@ def create_access_token(subject: str, role: UserRole):
 # =========================
 
 def create_refresh_token(subject: str, role: UserRole):
-    expire_days = settings.REFRESH_TOKEN_EXPIRE_DAYS
+    # Refresh token süresi genelde sabittir ama isterseniz bunu da config'den alabilirsiniz
+    expire_days = REFRESH_TOKEN_EXPIRE_DAYS 
+    
     payload, jti, expire = _build_token_payload(
         subject=subject,
         role=role,
@@ -97,16 +86,8 @@ def create_refresh_token(subject: str, role: UserRole):
     token = jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
     return token, jti, expire
 
-
-# =========================
-# DECODE HELPERS
-# =========================
-
+# ... (Geri kalan decode_token_raw, get_current_user vb. aynı kalabilir) ...
 def decode_token_raw(token: str) -> dict:
-    """
-    Ham payload döner. Test runner'ın jose sürümlerinde exp bazen datetime
-    dönebiliyor, bunu normalize ediyoruz.
-    """
     try:
         payload = jwt.decode(
             token,
@@ -116,30 +97,14 @@ def decode_token_raw(token: str) -> dict:
         )
     except ExpiredSignatureError:
         raise HTTPException(status_code=401, detail="Token expired")
-    except JWTClaimsError:
-        raise HTTPException(status_code=401, detail="Invalid token claims")
     except JWTError:
         raise HTTPException(status_code=401, detail="Invalid token")
 
-    # Normalize exp → timestamp (int)
     exp = payload.get("exp")
     if isinstance(exp, datetime):
         payload["exp"] = int(exp.timestamp())
 
     return payload
-
-
-def decode_token_subject(token: str) -> str | None:
-    try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        return payload.get("sub")
-    except JWTError:
-        return None
-
-
-# =========================
-# AUTH MODELS
-# =========================
 
 def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)) -> User:
     credentials_error = HTTPException(
@@ -147,34 +112,22 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
         detail="Invalid authentication credentials",
         headers={"WWW-Authenticate": "Bearer"},
     )
-
-    # Decode token properly
     payload = decode_token_raw(token)
-
-    # Access token türü doğrulanmalı
     if payload.get("type") != "access":
         raise credentials_error
-
     username = payload.get("sub")
     role_value = payload.get("role")
     jti = payload.get("jti")
-
     if not username or not jti:
         raise credentials_error
-
-    # Role parse
     try:
         role = UserRole(role_value)
     except Exception:
         raise credentials_error
-
-    # Kullanıcı al
     user = db.query(User).filter(User.username == username).first()
     if not user or not user.is_active:
         raise credentials_error
-
     return user
-
 
 def get_current_admin(current_user: User = Depends(get_current_user)) -> User:
     if current_user.role != UserRole.admin:

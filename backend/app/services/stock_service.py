@@ -1,11 +1,12 @@
 import logging
 from datetime import datetime
 from fastapi import HTTPException
+from sqlalchemy import func  # <--- EKLENDI
+
 from app.repositories.stock_repository import StockRepository
 from app.schemas.stock_schema import StockCreate, StockType
 from app.repositories.sponge_repository import SpongeRepository
-from sqlalchemy import func  
-from app.models.stocks import Stock
+from app.models.stocks import Stock # <--- EKLENDI
 
 logger = logging.getLogger(__name__)
 
@@ -28,6 +29,7 @@ class StockService:
             raise HTTPException(status_code=404, detail="Sponge not found")
 
         # 2) OUT işleminde stok yeterli mi?
+        # Not: get_total_stock metodunu repository'den çağırmak daha güvenlidir
         current = self.repo.get_total_stock(stock.sponge_id)
 
         if stock.type == StockType.out and stock.quantity > current:
@@ -59,22 +61,23 @@ class StockService:
         }
 
     def get_total_quantity(self, sponge_id: int):
+        # COALESCE kullanarak None dönmesini engelliyoruz (0 döner)
         in_qty = (
-            self.db.query(func.sum(Stock.quantity))
+            self.db.query(func.coalesce(func.sum(Stock.quantity), 0))
             .filter(Stock.sponge_id == sponge_id, Stock.type == StockType.in_)
-            .scalar() or 0
+            .scalar()
         )
 
         out_qty = (
-            self.db.query(func.sum(Stock.quantity))
+            self.db.query(func.coalesce(func.sum(Stock.quantity), 0))
             .filter(Stock.sponge_id == sponge_id, Stock.type == StockType.out)
-            .scalar() or 0
+            .scalar()
         )
 
         return_qty = (
-            self.db.query(func.sum(Stock.quantity))
+            self.db.query(func.coalesce(func.sum(Stock.quantity), 0))
             .filter(Stock.sponge_id == sponge_id, Stock.type == StockType.return_)
-            .scalar() or 0
+            .scalar()
         )
 
         return in_qty + return_qty - out_qty
