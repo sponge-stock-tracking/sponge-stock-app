@@ -27,6 +27,11 @@ class User(Base):
     # Relationships
     stocks = relationship("Stock", back_populates="user", cascade="all, delete")
     reports = relationship("Report", back_populates="user", cascade="all, delete")
+    refresh_tokens = relationship(
+        "RefreshToken",
+        back_populates="user",
+        cascade="all, delete-orphan"
+    )
 
     def __repr__(self):
         return f"<User(id={self.id}, username='{self.username}', role='{self.role}')>"

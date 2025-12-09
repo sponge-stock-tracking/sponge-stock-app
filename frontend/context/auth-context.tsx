@@ -1,57 +1,64 @@
-"use client"
+"use client";
 
-import { createContext, useContext, useState, useEffect, type ReactNode } from "react"
-import type { User } from "@/lib/types"
+import { createContext, useContext, useEffect, useState } from "react";
+import { login as loginApi, logout as logoutApi, getMe } from "@/api/auth";
+import { User } from "@/lib/types";
 
 interface AuthContextType {
-  user: User | null
-  login: (username: string, password: string) => boolean
-  logout: () => void
-  isLoading: boolean
+  user: User | null;
+  loading: boolean;
+  login: (u: string, p: string) => Promise<void>;
+  logout: () => Promise<void>;
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined)
+const AuthContext = createContext<AuthContextType>({
+  user: null,
+  loading: true,
+  login: async () => {},
+  logout: async () => {},
+});
 
-export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
+export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  const loadUser = async () => {
+    try {
+      const me = await getMe();
+      setUser(me);
+    } catch (err) {
+      setUser(null);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    // Check if user is logged in
-    const storedUser = localStorage.getItem("current_user")
-    if (storedUser) {
-      setUser(JSON.parse(storedUser))
-    }
-    setIsLoading(false)
-  }, [])
+    // İlk mount'ta localStorage erişim garantisi
+    setTimeout(() => {
+      loadUser();
+    }, 20);
+  }, []);
 
-  const login = (username: string, password: string): boolean => {
-    // Simple demo authentication
-    if (username === "admin" && password === "admin") {
-      const newUser: User = {
-        id: "1",
-        username: "admin",
-        name: "Yönetici",
-      }
-      setUser(newUser)
-      localStorage.setItem("current_user", JSON.stringify(newUser))
-      return true
-    }
-    return false
-  }
+  const login = async (username: string, password: string) => {
+    await loginApi(username, password);
 
-  const logout = () => {
-    setUser(null)
-    localStorage.removeItem("current_user")
-  }
+    // Tarayıcıya token yazılmasını bekletiyoruz
+    await new Promise((res) => setTimeout(res, 50));
 
-  return <AuthContext.Provider value={{ user, login, logout, isLoading }}>{children}</AuthContext.Provider>
-}
+    await loadUser();
+  };
 
-export function useAuth() {
-  const context = useContext(AuthContext)
-  if (context === undefined) {
-    throw new Error("useAuth must be used within an AuthProvider")
-  }
-  return context
-}
+  const logout = async () => {
+    await logoutApi();
+    setUser(null);
+  };
+
+  return (
+    <AuthContext.Provider value={{ user, loading, login, logout }}>
+      {children}
+    </AuthContext.Provider>
+  );
+};
+
+export const useAuth = () => useContext(AuthContext);

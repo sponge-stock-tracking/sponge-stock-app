@@ -19,11 +19,11 @@ Swagger arayüzünden (`/docs`) test edilebilir.
 
 ---
 
-## 📦 1. Sünger Yönetimi (`/api/v1/sponges`)
+## 📦 1. Sünger Yönetimi (`/sponges`)
 
 Sistem üzerindeki tüm sünger türlerinin CRUD işlemleri.
 
-### 🔹 `GET /api/v1/sponges/`
+### 🔹 `GET /sponges/`
 
 Tüm sünger türlerini listeler.
 
@@ -44,7 +44,7 @@ Tüm sünger türlerini listeler.
 
 ---
 
-### 🔹 `GET /api/v1/sponges/{id}`
+### 🔹 `GET /sponges/{id}`
 
 Belirli bir sünger türünü getirir.
 
@@ -63,7 +63,7 @@ Belirli bir sünger türünü getirir.
 
 ---
 
-### 🔹 `POST /api/v1/sponges/` 🔒 _(admin/operator)_
+### 🔹 `POST /sponges/` 🔒 _(admin/operator)_
 
 Yeni sünger türü oluşturur.
 
@@ -81,7 +81,7 @@ Yeni sünger türü oluşturur.
 
 ---
 
-### 🔹 `PUT /api/v1/sponges/{id}` 🔒 _(admin/operator)_
+### 🔹 `PUT /sponges/{id}` 🔒 _(admin/operator)_
 
 Var olan sünger türünü günceller.
 
@@ -95,35 +95,96 @@ Var olan sünger türünü günceller.
 
 ---
 
-### 🔹 `DELETE /api/v1/sponges/{id}` 🔒 _(admin)_
+### 🔹 `DELETE /sponges/{id}` 🔒 _(admin)_
 
 Sünger türünü sistemden siler. Silme işlemi loglanır.
 
 ---
 
-### 🔹 `GET /api/v1/sponges/{id}/summary`
+## 📊 2. Stok Yönetimi (`/stocks`)
 
-Tek bir sünger türü için genel özet döner.
+Stok giriş-çıkış işlemleri, fiyat takibi ve stok analizi.
+
+> **Not:** Static endpoint'ler (summary, by_date, status, total) her zaman dynamic route'lardan (`/{stock_id}`) önce tanımlanmıştır.
+
+### 🔹 `GET /stocks/summary`
+
+Tüm sünger türleri için toplam stok miktarlarını listeler.
+
+**Yanıt:**
+
+```json
+[
+  {
+    "sponge_id": 1,
+    "sponge_name": "Yüksek Yoğunluklu Sünger",
+    "total_stock": 45
+  }
+]
+```
+
+---
+
+### 🔹 `GET /stocks/by_date?start=YYYY-MM-DD&end=YYYY-MM-DD`
+
+Belirli tarih aralığındaki stok hareketlerini listeler.
+
+**Parametreler:**
+
+- `start`: Başlangıç tarihi (YYYY-MM-DD, zorunlu)
+- `end`: Bitiş tarihi (YYYY-MM-DD, zorunlu)
+
+**Yanıt:**
+
+```json
+[
+  {
+    "id": 1,
+    "sponge_id": 2,
+    "quantity": 150,
+    "type": "in",
+    "price_in": 250.5,
+    "price_out": null,
+    "note": "Yeni tedarik",
+    "date": "2025-12-05T10:34:00"
+  }
+]
+```
+
+---
+
+### 🔹 `GET /stocks/{sponge_id}/status`
+
+Belirli bir sünger için stok durumunu ve kritik stok uyarısını döner.
 
 **Yanıt:**
 
 ```json
 {
-  "sponge": { "id": 1, "name": "Yumuşak 10cm" },
-  "total_in": 400,
-  "total_out": 350,
-  "available": 50,
-  "last_transaction": "2025-12-03T18:00:00"
+  "sponge_id": 1,
+  "total": 45,
+  "critical": true
 }
 ```
 
 ---
 
-## 📊 2. Stok Yönetimi (`/api/v1/stocks`)
+### 🔹 `GET /stocks/{sponge_id}/total`
 
-Stok giriş-çıkış işlemleri, fiyat takibi ve stok analizi.
+Belirli bir sünger için toplam stok miktarını hesaplar (giriş + iade - çıkış).
 
-### 🔹 `GET /api/v1/stocks/`
+**Yanıt:**
+
+```json
+{
+  "sponge_id": 1,
+  "total": 45
+}
+```
+
+---
+
+### 🔹 `GET /stocks/`
 
 Tüm stok hareketlerini listeler.
 
@@ -146,7 +207,28 @@ Tüm stok hareketlerini listeler.
 
 ---
 
-### 🔹 `POST /api/v1/stocks/` 🔒 _(operator)_
+### 🔹 `GET /stocks/{stock_id}`
+
+Belirli bir stok hareketini getirir.
+
+**Yanıt:**
+
+```json
+{
+  "id": 1,
+  "sponge_id": 2,
+  "quantity": 150,
+  "type": "in",
+  "price_in": 250.5,
+  "price_out": null,
+  "note": "Yeni tedarik",
+  "date": "2025-12-05T10:34:00"
+}
+```
+
+---
+
+### 🔹 `POST /stocks/` 🔒 _(operator)_
 
 Yeni stok hareketi ekler (giriş, çıkış veya iade).
 
@@ -165,104 +247,164 @@ Yeni stok hareketi ekler (giriş, çıkış veya iade).
 
 ---
 
-### 🔹 `GET /api/v1/stocks/summary`
+### 🔹 `DELETE /stocks/{stock_id}` 🔒 _(admin)_
 
-Tüm sünger türleri için toplam stok miktarlarını listeler.
+Belirli bir stok kaydını siler.
 
----
+**Yanıt:**
 
-### 🔹 `GET /api/v1/stocks/critical?limit=20`
-
-Kritik stok seviyesinin altına düşen ürünleri getirir (opsiyonel limit parametresiyle).
-
----
-
-### 🔹 `GET /api/v1/stocks/by_date?start=YYYY-MM-DD&end=YYYY-MM-DD&sort=asc|desc`
-
-Belirli tarih aralığındaki stok hareketlerini listeler.
+```json
+{
+  "message": "Stock record deleted successfully"
+}
+```
 
 ---
 
-## 👥 3. Kullanıcı Yönetimi (`/api/v1/users`)
+## 👥 3. Kullanıcı Yönetimi (`/users`)
 
-### 🔹 `POST /api/v1/users/register`
+### 🔹 `POST /users/register`
 
-Yeni kullanıcı oluşturur. Sadece admin tarafından çağrılabilir.
-
-### 🔹 `POST /api/v1/users/login`
-
-JWT token üretir.
-
-### 🔹 `GET /api/v1/users/me` 🔒
-
-Aktif kullanıcı bilgisini döner.
-
-### 🔹 `PUT /api/v1/users/{id}/role` 🔒 _(admin)_
-
-Kullanıcının rolünü günceller.
-
-### 🔹 `DELETE /api/v1/users/{id}` 🔒 _(admin)_
-
-Kullanıcıyı sistemden siler.
-
----
-
-## 📈 4. Raporlama (`/api/v1/reports`)
-
-### 🔹 `GET /api/v1/reports/weekly?start=2025-12-01&end=2025-12-07`
-
-Son 7 güne ait stok değişim raporu döner.
-
-### 🔹 `GET /api/v1/reports/monthly`
-
-Aylık stok hareketi.
-
-### 🔹 `GET /api/v1/reports/critical`
-
-Kritik stokta olan ürünlerin uyarı raporu.
-
-### 🔹 `POST /api/v1/reports/export` 🔒 _(admin)_
-
-Raporları PDF veya CSV formatında dışa aktarır.
-
----
-
-## 📨 5. Bildirim Sistemi (`/api/v1/notifications`)
-
-### 🔹 `POST /api/v1/notifications/send` 🔒 _(admin)_
-
-Kritik stok için e-posta bildirimi gönderir.
+Yeni kullanıcı oluşturur.
 
 **İstek Gövdesi:**
 
 ```json
 {
-  "email": "admin@factory.com",
-  "subject": "Kritik Stok Uyarısı",
-  "message": "A18-Yumuşak stok seviyesi 5 m³ altında.",
-  "mode": "auto",
-  "threshold": 10
+  "username": "john_doe",
+  "email": "john@example.com",
+  "password": "SecurePassword123",
+  "role": "operator"
+}
+```
+
+**Yanıt:**
+
+```json
+{
+  "id": 1,
+  "username": "john_doe",
+  "email": "john@example.com",
+  "role": "operator"
 }
 ```
 
 ---
 
-## 🧩 6. Sistem & Sağlık Durumu (`/api/v1/system`)
+### 🔹 `POST /users/login`
 
-### 🔹 `GET /api/v1/health`
+JWT token üretir.
 
-Sistemin genel durumunu döner.
+**İstek Gövdesi (form-data):**
+
+```
+grant_type=
+username=john_doe
+password=SecurePassword123
+```
+
+**Yanıt:**
 
 ```json
 {
-  "status": "ok",
-  "db": "connected"
+  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "refresh_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "token_type": "bearer"
 }
 ```
 
-### 🔹 `GET /api/v1/logs?limit=50`
+---
 
-Son işlemleri listeler (sadece admin).
+### 🔹 `POST /users/refresh`
+
+Refresh token kullanarak yeni access token üretir.
+
+**İstek Gövdesi:**
+
+```json
+{
+  "refresh_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+}
+```
+
+---
+
+### 🔹 `POST /users/logout` 🔒
+
+Kullanıcının tüm refresh token'larını iptal eder.
+
+---
+
+### 🔹 `GET /users/me` 🔒
+
+Aktif kullanıcı bilgisini döner.
+
+**Yanıt:**
+
+```json
+{
+  "id": 1,
+  "username": "john_doe",
+  "email": "john@example.com",
+  "role": "operator"
+}
+```
+
+---
+
+## 📈 4. Raporlama (`/reports`)
+
+### 🔹 `GET /reports/weekly`
+
+Son 7 güne ait stok değişim raporu döner.
+
+**Yanıt:**
+
+```json
+{
+  "period": "weekly",
+  "data": [...]
+}
+```
+
+---
+
+### 🔹 `GET /reports/monthly`
+
+İçinde bulunulan aya ait stok hareketleri.
+
+**Yanıt:**
+
+```json
+{
+  "period": "monthly",
+  "data": [...]
+}
+```
+
+---
+
+### 🔹 `GET /reports/critical?notify=false`
+
+Kritik stokta olan ürünlerin uyarı raporu.
+
+**Parametreler:**
+
+- `notify`: E-posta bildirimi gönderilsin mi? (default: false)
+
+**Yanıt:**
+
+```json
+[
+  {
+    "sponge_id": 1,
+    "name": "Yumuşak Sünger 10cm",
+    "current_stock": 15,
+    "critical_stock": 50,
+    "status": "critical"
+  }
+]
+```
 
 ---
 
@@ -272,33 +414,39 @@ Son işlemleri listeler (sadece admin).
 | -------------------- | -------------------------------- |
 | **Kimlik Doğrulama** | Bearer Token (JWT)               |
 | **Yanıt Formatı**    | JSON                             |
-| **Hata Durumları**   | 400, 401, 404, 500               |
+| **Hata Durumları**   | 400, 401, 404, 409, 500          |
 | **Zaman Formatı**    | ISO 8601 (`YYYY-MM-DDTHH:mm:ss`) |
-| **Pagination**       | `?page=1&limit=50` desteklenir   |
+| **Base URL**         | `http://localhost:8000`          |
 
 ---
 
 ## 🧪 Test Edilebilir Endpoint Listesi (Postman / Swagger)
 
-| Modül         | Endpoint                     | Test Durumu   |
-| ------------- | ---------------------------- | ------------- |
-| Sponge        | `/api/v1/sponges/`           | ✅            |
-| Stock         | `/api/v1/stocks/summary`     | ✅            |
-| Reports       | `/api/v1/reports/weekly`     | 🔄 geliştirme |
-| Users         | `/api/v1/users/login`        | ✅            |
-| Notifications | `/api/v1/notifications/send` | 🔄 geliştirme |
-| System        | `/api/v1/health`             | ✅            |
+| Modül   | Endpoint              | Test Durumu |
+| ------- | --------------------- | ----------- |
+| Sponge  | `/sponges/`           | ✅          |
+| Stock   | `/stocks/summary`     | ✅          |
+| Stock   | `/stocks/{id}/status` | ✅          |
+| Reports | `/reports/weekly`     | ✅          |
+| Reports | `/reports/critical`   | ✅          |
+| Users   | `/users/login`        | ✅          |
+| Users   | `/users/register`     | ✅          |
+| Users   | `/users/refresh`      | ✅          |
 
 ---
 
-## 🧾 Versiyonlama Notu
+## 🧾 API Erişimi
 
-Tüm endpointler `v1` altında toplanmıştır.
-Örneğin:
+Tüm endpoint'ler doğrudan root path altındadır:
 
 ```
-/api/v1/sponges/
-/api/v1/stocks/
+http://localhost:8000/sponges/
+http://localhost:8000/stocks/
+http://localhost:8000/users/login
+http://localhost:8000/reports/critical
 ```
 
-Bu yapı, ileride `v2` sürümüne geçildiğinde geriye dönük uyumluluk sağlar.
+**Swagger UI:** `http://localhost:8000/docs`  
+**ReDoc:** `http://localhost:8000/redoc`
+
+İleride versiyonlama gerekirse `/api/v1` prefix'i eklenebilir.

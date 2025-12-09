@@ -2,10 +2,10 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts"
-import type { StokHareket } from "@/lib/types"
+import type { StockMovement } from "@/lib/types"
 
 interface WeeklyChartProps {
-  hareketler: StokHareket[]
+  hareketler: StockMovement[]
 }
 
 export function WeeklyChart({ hareketler }: WeeklyChartProps) {
@@ -16,9 +16,9 @@ export function WeeklyChart({ hareketler }: WeeklyChartProps) {
     date.setDate(date.getDate() - i)
     const dateStr = date.toISOString().split("T")[0]
 
-    const gunHareketler = hareketler.filter((h) => h.tarih.startsWith(dateStr))
-    const giris = gunHareketler.filter((h) => h.tip === "giris").reduce((sum, h) => sum + h.miktar, 0)
-    const cikis = gunHareketler.filter((h) => h.tip === "cikis").reduce((sum, h) => sum + h.miktar, 0)
+    const gunHareketler = hareketler?.filter((h) => h.date.startsWith(dateStr)) || []
+    const giris = gunHareketler.filter((h) => h.type === "in").reduce((sum, h) => sum + h.quantity, 0)
+    const cikis = gunHareketler.filter((h) => h.type === "out").reduce((sum, h) => sum + h.quantity, 0)
 
     chartData.push({
       gun: date.toLocaleDateString("tr-TR", { weekday: "short" }),

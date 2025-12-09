@@ -1,0 +1,63 @@
+services:
+  backend:
+    build: ./backend
+    container_name: sponge-backend
+    restart: always
+    env_file:
+      - ./backend/.env
+    ports:
+      - "8000:8000"
+    networks:
+      - sponge-net
+    volumes:
+      # Code sync for development (hot reload)
+      - ./backend/app:/app/app:ro
+      - ./backend/migrations:/app/migrations
+      # Don't mount __pycache__
+    environment:
+      - PYTHONUNBUFFERED=1
+      - PYTHONDONTWRITEBYTECODE=1
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+
+  # Frontend service (OPTIONAL for development)
+  # For local development, it's recommended to run: npm run dev
+  # This container is mainly for production/testing purposes
+  frontend:
+    build: ./frontend
+    container_name: sponge-frontend
+    restart: always
+    depends_on:
+      - backend
+    ports:
+      - "3000:3000"
+    networks:
+      - sponge-net
+    volumes:
+      # Code sync for development (hot reload)
+      - ./frontend/app:/app/app:ro
+      - ./frontend/components:/app/components:ro
+      - ./frontend/api:/app/api:ro
+      - ./frontend/lib:/app/lib:ro
+      - ./frontend/hooks:/app/hooks:ro
+      - ./frontend/context:/app/context:ro
+      - ./frontend/styles:/app/styles:ro
+      - ./frontend/public:/app/public:ro
+      # Config files
+      - ./frontend/next.config.mjs:/app/next.config.mjs:ro
+      - ./frontend/tsconfig.json:/app/tsconfig.json:ro
+      - ./frontend/postcss.config.mjs:/app/postcss.config.mjs:ro
+      - ./frontend/components.json:/app/components.json:ro
+      # Don't mount node_modules and .next (keep in container)
+    environment:
+      # NOTE: In Docker, backend is accessed via service name
+      # But browser requests still go to localhost:8000
+      - NEXT_PUBLIC_API_URL=http://localhost:8000
+      - NODE_ENV=development
+      - WATCHPACK_POLLING=true
+    profiles:
+      - full  # Only starts with: docker compose --profile full up
+
+networks:
+  sponge-net:
+    driver: bridge
+

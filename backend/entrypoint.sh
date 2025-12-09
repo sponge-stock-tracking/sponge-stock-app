@@ -1,15 +1,19 @@
 #!/bin/bash
 set -e
 
-echo "📦 [Backend] Waiting for database to be ready..."
+echo "⏳ [Backend] Starting Sponge Stock API with Supabase DB..."
 
-# Veritabanı hazır olana kadar bekle
-until pg_isready -h "${POSTGRES_HOST}" -U "${POSTGRES_USER}"; do
-  sleep 1
-done
+# Wait a moment for network to be ready
+sleep 2
 
 echo "🔄 [Backend] Running Alembic migrations..."
-alembic upgrade head
+if alembic upgrade head; then
+    echo "✅ [Backend] Migrations completed successfully"
+else
+    echo "⚠️  [Backend] Migration failed or already applied"
+fi
 
-echo "🚀 [Backend] Starting API server..."
+echo "🚀 [Backend] Starting FastAPI with uvicorn..."
+# Note: Command is overridden in docker-compose for dev mode with --reload
 exec uvicorn app.main:app --host 0.0.0.0 --port 8000
+

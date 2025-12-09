@@ -22,6 +22,14 @@ class SpongeService:
         return sponge
 
     def create(self, sponge: SpongeCreate):
+        # 🔥 Duplicate kontrolü
+        existing = self.repo.get_by_name(sponge.name)
+        if existing:
+            raise HTTPException(
+                status_code=409,
+                detail="Bu sünger adı zaten mevcut."
+            )
+
         try:
             return self.repo.create(sponge)
         except ValueError as e:
@@ -29,9 +37,20 @@ class SpongeService:
             raise HTTPException(status_code=400, detail=str(e))
 
     def update(self, sponge_id: int, sponge: SpongeCreate):
+        # 1. Kayıt var mı?
         obj = self.repo.get_by_id(sponge_id)
         if not obj:
             raise HTTPException(status_code=404, detail="Sünger bulunamadı.")
+        
+        # 2. DÜZELTME: İsim değişikliği varsa, yeni isim başka kayıtta var mı?
+        if sponge.name != obj.name:
+            existing = self.repo.get_by_name(sponge.name)
+            if existing:
+                raise HTTPException(
+                    status_code=409, 
+                    detail="Bu sünger adı zaten başka bir kayıt tarafından kullanılıyor."
+                )
+
         return self.repo.update(sponge_id, sponge)
 
     def delete(self, sponge_id: int):
