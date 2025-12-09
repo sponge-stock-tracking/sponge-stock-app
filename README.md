@@ -7,14 +7,14 @@ Yazılım Mühendisliği dersi kapsamında, proje yönetimi süreçlerini gerçe
 
 ## 📌 Teknoloji Altyapısı
 
-| Katman | Teknoloji |
-|-------|-----------|
-| Backend | Python • FastAPI |
-| Database | PostgreSQL |
-| Frontend | Next.js (React) |
-| Auth | JWT tabanlı kimlik doğrulama |
-| UI - UX | Responsive Web Arayüzü |
-| DevOps | Docker (Sprint 2 sonrası planlı) |
+| Katman   | Teknoloji                        |
+| -------- | -------------------------------- |
+| Backend  | Python • FastAPI                 |
+| Database | PostgreSQL                       |
+| Frontend | Next.js (React)                  |
+| Auth     | JWT tabanlı kimlik doğrulama     |
+| UI - UX  | Responsive Web Arayüzü           |
+| DevOps   | Docker (Sprint 2 sonrası planlı) |
 
 ---
 
@@ -50,16 +50,16 @@ Yazılım Mühendisliği dersi kapsamında, proje yönetimi süreçlerini gerçe
 
 ## 👥 Takım ve Roller
 
-| Rol | Sorumluluk |
-|---|---|
-| Project Manager • Tech Lead | Planlama, mimari, kod rehberliği |
-| Scrum Master | Sprint board düzeni, toplantılar |
-| Backend Developers | API, veri modeli, iş mantığı |
-| Frontend Developers | UI geliştirme |
-| Database Designer | ERD, veri bütünlüğü |
-| QA / Tester | Test senaryoları ve dokümantasyon |
-| Business Analyst | Gereksinim toplama ve Use Case |
-| Documentation Owner | Rapor ve wiki yönetimi |
+| Rol                         | Sorumluluk                        |
+| --------------------------- | --------------------------------- |
+| Project Manager • Tech Lead | Planlama, mimari, kod rehberliği  |
+| Scrum Master                | Sprint board düzeni, toplantılar  |
+| Backend Developers          | API, veri modeli, iş mantığı      |
+| Frontend Developers         | UI geliştirme                     |
+| Database Designer           | ERD, veri bütünlüğü               |
+| QA / Tester                 | Test senaryoları ve dokümantasyon |
+| Business Analyst            | Gereksinim toplama ve Use Case    |
+| Documentation Owner         | Rapor ve wiki yönetimi            |
 
 (Ekip listesi Sprint 0 sonunda buraya eklenecektir.)
 
@@ -67,13 +67,13 @@ Yazılım Mühendisliği dersi kapsamında, proje yönetimi süreçlerini gerçe
 
 ## 📅 Sprint Planı (Özet)
 
-| Sprint | Hedef | Çıktı |
-|---|---|---|
-| Sprint 0 | Setup & Fizibilite | Repo, Board, Fizibilite raporu |
-| Sprint 1 | Sünger veri modeli + CRUD | Veri tabanı + API |
-| Sprint 2 | Stok hareketleri + UI | Giriş/çıkış ekranları |
-| Sprint 3 | Dashboard & Uyarılar | Grafik ve mail uyarı sistemi |
-| Sprint 4 | Test & Final Demo | Sunum + raporlar |
+| Sprint   | Hedef                     | Çıktı                          |
+| -------- | ------------------------- | ------------------------------ |
+| Sprint 0 | Setup & Fizibilite        | Repo, Board, Fizibilite raporu |
+| Sprint 1 | Sünger veri modeli + CRUD | Veri tabanı + API              |
+| Sprint 2 | Stok hareketleri + UI     | Giriş/çıkış ekranları          |
+| Sprint 3 | Dashboard & Uyarılar      | Grafik ve mail uyarı sistemi   |
+| Sprint 4 | Test & Final Demo         | Sunum + raporlar               |
 
 ---
 
