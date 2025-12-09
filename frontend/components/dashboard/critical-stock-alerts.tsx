@@ -4,15 +4,15 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Button } from "@/components/ui/button"
 import { AlertTriangle } from "lucide-react"
-import type { StokDurum } from "@/lib/types"
+import type { DashboardStockStatus } from "@/lib/types"
 
 interface CriticalStockAlertsProps {
-  stokDurumlari: StokDurum[]
+  stokDurumlari: DashboardStockStatus[]
   onViewAll?: () => void
 }
 
 export function CriticalStockAlerts({ stokDurumlari, onViewAll }: CriticalStockAlertsProps) {
-  const kritikStoklar = stokDurumlari.filter((stok) => stok.mevcutStok <= stok.kritikStok)
+  const kritikStoklar = stokDurumlari.filter((stok) => stok.is_critical)
 
   if (kritikStoklar.length === 0) {
     return null
@@ -39,10 +39,9 @@ export function CriticalStockAlerts({ stokDurumlari, onViewAll }: CriticalStockA
       <CardContent>
         <div className="space-y-3">
           {displayedStoklar.map((stok) => (
-            <Alert key={stok.sungerId} variant="destructive" className="bg-white">
+            <Alert key={stok.sponge_id} variant="destructive" className="bg-white">
               <AlertDescription>
-                <span className="font-semibold">{stok.sungerAd}</span> - Mevcut: {stok.mevcutStok} {stok.birim} (Kritik
-                Seviye: {stok.kritikStok})
+                <span className="font-semibold">{stok.name}</span> - Mevcut: {stok.current_stock} (Kritik Seviye: {stok.critical_stock})
               </AlertDescription>
             </Alert>
           ))}

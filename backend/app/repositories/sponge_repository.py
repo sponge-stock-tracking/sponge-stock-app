@@ -13,9 +13,12 @@ class SpongeRepository:
     def get_by_id(self, sponge_id: int):
         return self.db.query(Sponge).filter(Sponge.id == sponge_id).first()
 
+    def get_by_name(self, name: str):
+        return self.db.query(Sponge).filter(Sponge.name == name).first()
+
     def create(self, sponge: SpongeCreate):
         try:
-            obj = Sponge(**sponge.dict())
+            obj = Sponge(**sponge.model_dump())
             self.db.add(obj)
             self.db.commit()
             self.db.refresh(obj)
@@ -28,9 +31,11 @@ class SpongeRepository:
         obj = self.get_by_id(sponge_id)
         if not obj:
             return None
-        for key, value in sponge.dict().items():
+
+        for key, value in sponge.model_dump().items():
             if value is not None:
                 setattr(obj, key, value)
+
         self.db.commit()
         self.db.refresh(obj)
         return obj
@@ -39,6 +44,7 @@ class SpongeRepository:
         obj = self.get_by_id(sponge_id)
         if not obj:
             return None
+
         self.db.delete(obj)
         self.db.commit()
         return obj

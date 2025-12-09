@@ -34,10 +34,10 @@ export function Navbar() {
 
           <div className="flex items-center gap-3">
             <Avatar className="h-9 w-9">
-              <AvatarFallback className="bg-primary text-primary-foreground">{user?.name.charAt(0)}</AvatarFallback>
+              <AvatarFallback className="bg-primary text-primary-foreground">{user?.username?.charAt(0) || '?'}</AvatarFallback>
             </Avatar>
             <div className="hidden sm:block">
-              <p className="text-sm font-medium leading-none">{user?.name}</p>
+              <p className="text-sm font-medium leading-none">{user?.username}</p>
               <p className="text-xs text-muted-foreground">{user?.username}</p>
             </div>
           </div>

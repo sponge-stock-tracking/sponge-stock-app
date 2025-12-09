@@ -2,27 +2,27 @@
 
 import { Card, CardContent } from "@/components/ui/card"
 import { Package, AlertTriangle, TrendingUp, TrendingDown } from "lucide-react"
-import type { StokDurum, StokHareket } from "@/lib/types"
+import type { DashboardStockStatus, StockMovement } from "@/lib/types"
 import { useRouter } from "next/navigation"
 
 interface StatsCardsProps {
-  stokDurumlari: StokDurum[]
-  hareketler: StokHareket[]
+  stokDurumlari: DashboardStockStatus[]
+  hareketler: StockMovement[]
 }
 
 export function StatsCards({ stokDurumlari, hareketler }: StatsCardsProps) {
   const router = useRouter()
 
-  const toplamStok = stokDurumlari.reduce((sum, stok) => sum + stok.mevcutStok, 0)
-  const kritikStokSayisi = stokDurumlari.filter((stok) => stok.mevcutStok <= stok.kritikStok).length
+  const toplamStok = stokDurumlari.reduce((sum, stok) => sum + stok.current_stock, 0)
+  const kritikStokSayisi = stokDurumlari.filter((stok) => stok.is_critical).length
 
   // Son 7 gün
   const yediGunOnce = new Date()
   yediGunOnce.setDate(yediGunOnce.getDate() - 7)
 
-  const sonHareketler = hareketler.filter((h) => new Date(h.tarih) >= yediGunOnce)
-  const haftalikGiris = sonHareketler.filter((h) => h.tip === "giris").reduce((sum, h) => sum + h.miktar, 0)
-  const haftalikCikis = sonHareketler.filter((h) => h.tip === "cikis").reduce((sum, h) => sum + h.miktar, 0)
+  const sonHareketler = hareketler?.filter((h) => new Date(h.date) >= yediGunOnce) || []
+  const haftalikGiris = sonHareketler.filter((h) => h.type === "in").reduce((sum, h) => sum + h.quantity, 0)
+  const haftalikCikis = sonHareketler.filter((h) => h.type === "out").reduce((sum, h) => sum + h.quantity, 0)
 
   const stats = [
     {

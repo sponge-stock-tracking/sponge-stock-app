@@ -3,20 +3,20 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { ArrowUpCircle, ArrowDownCircle } from "lucide-react"
-import type { StokHareket, SungerTuru } from "@/lib/types"
+import type { StockMovement, Sponge } from "@/lib/types"
 
 interface RecentActivitiesProps {
-  hareketler: StokHareket[]
-  sungerler: SungerTuru[]
+  hareketler: StockMovement[]
+  sungerler: Sponge[]
 }
 
 export function RecentActivities({ hareketler, sungerler }: RecentActivitiesProps) {
-  const sonHareketler = [...hareketler]
-    .sort((a, b) => new Date(b.tarih).getTime() - new Date(a.tarih).getTime())
+  const sonHareketler = [...(hareketler || [])]
+    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
     .slice(0, 5)
 
-  const getSungerAd = (sungerId: string) => {
-    return sungerler.find((s) => s.id === sungerId)?.ad || "Bilinmeyen"
+  const getSungerAd = (sungerId: number) => {
+    return sungerler?.find((s) => s.id === sungerId)?.name || "Bilinmeyen"
   }
 
   return (
@@ -31,8 +31,8 @@ export function RecentActivities({ hareketler, sungerler }: RecentActivitiesProp
           ) : (
             sonHareketler.map((hareket) => (
               <div key={hareket.id} className="flex items-start gap-3 pb-4 border-b last:border-0 last:pb-0">
-                <div className={`mt-0.5 ${hareket.tip === "giris" ? "text-green-600" : "text-red-600"}`}>
-                  {hareket.tip === "giris" ? (
+                <div className={`mt-0.5 ${hareket.type === "in" ? "text-green-600" : "text-red-600"}`}>
+                  {hareket.type === "in" ? (
                     <ArrowUpCircle className="h-5 w-5" />
                   ) : (
                     <ArrowDownCircle className="h-5 w-5" />
@@ -40,15 +40,15 @@ export function RecentActivities({ hareketler, sungerler }: RecentActivitiesProp
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-start justify-between gap-2">
-                    <p className="text-sm font-medium truncate">{getSungerAd(hareket.sungerId)}</p>
-                    <Badge variant={hareket.tip === "giris" ? "default" : "destructive"} className="shrink-0">
-                      {hareket.tip === "giris" ? "Giriş" : "Çıkış"}
+                    <p className="text-sm font-medium truncate">{getSungerAd(hareket.sponge_id)}</p>
+                    <Badge variant={hareket.type === "in" ? "default" : "destructive"} className="shrink-0">
+                      {hareket.type === "in" ? "Giriş" : hareket.type === "out" ? "Çıkış" : "İade"}
                     </Badge>
                   </div>
                   <p className="text-sm text-muted-foreground mt-1">
-                    {hareket.miktar} adet • {new Date(hareket.tarih).toLocaleDateString("tr-TR")}
+                    {hareket.quantity} adet • {new Date(hareket.date).toLocaleDateString("tr-TR")}
                   </p>
-                  {hareket.aciklama && <p className="text-xs text-muted-foreground mt-1">{hareket.aciklama}</p>}
+                  {hareket.note && <p className="text-xs text-muted-foreground mt-1">{hareket.note}</p>}
                 </div>
               </div>
             ))

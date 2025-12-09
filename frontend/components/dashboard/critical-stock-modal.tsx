@@ -4,21 +4,21 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import type { StokDurum } from "@/lib/types"
+import type { DashboardStockStatus } from "@/lib/types"
 import { AlertTriangle, Package } from "lucide-react"
 import { useRouter } from "next/navigation"
 
 interface CriticalStockModalProps {
   open: boolean
   onOpenChange: (open: boolean) => void
-  kritikStoklar: StokDurum[]
+  kritikStoklar: DashboardStockStatus[]
 }
 
 export function CriticalStockModal({ open, onOpenChange, kritikStoklar }: CriticalStockModalProps) {
   const router = useRouter()
 
-  const getCriticalLevel = (stok: StokDurum) => {
-    const percentage = (stok.mevcutStok / stok.kritikStok) * 100
+  const getCriticalLevel = (stok: DashboardStockStatus) => {
+    const percentage = (stok.current_stock / stok.critical_stock) * 100
     if (percentage <= 50) return { label: "Çok Kritik", variant: "destructive" as const, color: "text-red-600" }
     return { label: "Kritik", variant: "secondary" as const, color: "text-orange-600" }
   }
@@ -57,15 +57,15 @@ export function CriticalStockModal({ open, onOpenChange, kritikStoklar }: Critic
                 {kritikStoklar.map((stok) => {
                   const level = getCriticalLevel(stok)
                   return (
-                    <TableRow key={stok.sungerId}>
-                      <TableCell className="font-medium">{stok.sungerAd}</TableCell>
+                    <TableRow key={stok.sponge_id}>
+                      <TableCell className="font-medium">{stok.name}</TableCell>
                       <TableCell className="text-right">
                         <span className={`font-semibold ${level.color}`}>
-                          {stok.mevcutStok.toLocaleString("tr-TR")} {stok.birim}
+                          {stok.current_stock.toLocaleString("tr-TR")}
                         </span>
                       </TableCell>
                       <TableCell className="text-right text-muted-foreground">
-                        {stok.kritikStok.toLocaleString("tr-TR")} {stok.birim}
+                        {stok.critical_stock.toLocaleString("tr-TR")}
                       </TableCell>
                       <TableCell className="text-center">
                         <Badge variant={level.variant}>{level.label}</Badge>

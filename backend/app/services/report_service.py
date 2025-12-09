@@ -1,15 +1,20 @@
 import logging
 from datetime import datetime, timedelta
 from fastapi import HTTPException
+from sqlalchemy.orm import Session
 from app.repositories.report_repository import ReportRepository
+from app.repositories.notification_repository import NotificationRepository
 from app.services.notification_service import NotificationService
+from app.schemas.notification_schema import NotificationCreate
 
 logger = logging.getLogger(__name__)
 
 class ReportService:
-    def __init__(self, db):
+    def __init__(self, db: Session):
+        self.db = db
         self.repo = ReportRepository(db)
         self.notifier = NotificationService()
+        self.notification_repo = NotificationRepository(db)
 
     def weekly(self):
         data = self.repo.get_weekly_summary()
@@ -61,18 +66,34 @@ class ReportService:
         if not formatted:
             return {"message": "Kritik stokta ürün bulunmuyor."}
 
+        # Bildirim oluştur (her zaman)
+        for item in formatted:
+            notification = NotificationCreate(
+                title="⚠️ Kritik Stok Uyarısı",
+                message=f"{item['name']} stoğu kritik seviyede: {item['available_stock']:.0f} / {item['critical_stock']:.0f}",
+                type="warning"
+            )
+            try:
+                self.notification_repo.create(notification)
+                logger.info(f"Kritik stok bildirimi oluşturuldu: {item['name']}")
+            except Exception as e:
+                logger.error(f"Bildirim oluşturma hatası: {e}")
+
+        # E-posta gönder (isteğe bağlı)
         if notify:
             try:
                 body = "<h3>Kritik Stok Uyarısı</h3><ul>"
                 for item in formatted:
                     body += f"<li>{item['name']} — {item['available_stock']} / {item['critical_stock']}</li>"
                 body += "</ul>"
-                self.notifier.send_email(
+                result = self.notifier.send_email(
                     to=["admin@factory.com"],
                     subject="⚠️ Kritik Stok Uyarısı",
                     body=body,
                 )
+                logger.info(f"E-posta gönderimi: {result}")
             except Exception as e:
                 logger.error(f"E-posta gönderimi başarısız: {e}")
                 raise HTTPException(status_code=500, detail="E-posta gönderimi başarısız.")
+        
         return formatted
