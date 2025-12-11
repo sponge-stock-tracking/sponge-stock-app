@@ -164,3 +164,17 @@ body {
   color: var(--color-foreground);
   font-feature-settings: "rlig" 1, "calt" 1;
 }
+
+/* Hide Next.js dev indicator */
+#__next-build-watcher {
+  display: none !important;
+}
+
+nextjs-portal {
+  display: none !important;
+}
+
+[data-nextjs-dialog-overlay],
+[data-nextjs-toast] {
+  display: none !important;
+}

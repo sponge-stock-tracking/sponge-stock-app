@@ -9,9 +9,6 @@ const nextConfig = {
   devIndicators: {
     appIsrStatus: false,
   },
-  experimental: {
-    devOverlays: false,
-  },
 }
 
 export default nextConfig
