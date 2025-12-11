@@ -17,6 +17,7 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
   (res) => res,
   async (err) => {
+    console.log("Axios interceptor caught error:", err.response?.status, err.response?.data);
     const originalRequest = err.config;
 
     if (err.response?.status === 401 && !originalRequest._retry) {
@@ -39,7 +40,9 @@ api.interceptors.response.use(
         originalRequest.headers.Authorization = `Bearer ${res.data.access_token}`;
         return api(originalRequest);
       } catch (e) {
-        console.error("Refresh token expired", e);
+        // Refresh token is invalid/expired - clear all tokens
+        localStorage.removeItem("access_token");
+        localStorage.removeItem("refresh_token");
         return Promise.reject(e);
       }
     }

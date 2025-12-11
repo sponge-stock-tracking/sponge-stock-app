@@ -1,5 +1,5 @@
 import api from "./axios";
-import { User } from "@/lib/types";
+import { User, UserCreate } from "@/lib/types";
 
 export const login = async (username: string, password: string) => {
   const form = new FormData();
@@ -16,6 +16,10 @@ export const login = async (username: string, password: string) => {
   return res.data;
 };
 
+export const register = async (userData: UserCreate): Promise<User> => {
+  const res = await api.post("/users/register", userData);
+  return res.data;
+};
 
 export const logout = async () => {
   try {

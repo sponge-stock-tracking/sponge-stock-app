@@ -23,7 +23,7 @@ export default function LoginPage() {
   const { login } = useAuth()
   const router = useRouter()
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError("")
 
@@ -32,11 +32,20 @@ export default function LoginPage() {
       return
     }
 
-    const success = login(username, password)
-    if (success) {
+    try {
+      await login(username, password)
       router.push("/dashboard")
-    } else {
-      setError("Kullanıcı adı veya şifre hatalı")
+    } catch (error: any) {
+      const status = error.response?.status
+      const detail = error.response?.data?.detail
+      
+      if (status === 401) {
+        setError("Kullanıcı adı veya şifre hatalı")
+      } else if (detail) {
+        setError(detail)
+      } else {
+        setError("Giriş yapılırken bir hata oluştu")
+      }
     }
   }
 

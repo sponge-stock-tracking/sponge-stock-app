@@ -6,6 +6,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { LogOut, Package } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { NotificationDropdown } from "@/components/notification-dropdown"
+import { RegisterDialog } from "@/components/register-dialog"
 
 export function Navbar() {
   const { user, logout } = useAuth()
@@ -31,6 +32,8 @@ export function Navbar() {
 
         <div className="flex items-center gap-4">
           <NotificationDropdown />
+          
+          {user?.role === "admin" && <RegisterDialog />}
 
           <div className="flex items-center gap-3">
             <Avatar className="h-9 w-9">
