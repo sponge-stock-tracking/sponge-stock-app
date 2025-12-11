@@ -61,19 +61,24 @@ export function StatsCards({ stokDurumlari, hareketler }: StatsCardsProps) {
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-      {stats.map((stat) => (
+      {stats.map((stat, index) => (
         <Card
           key={stat.title}
-          className="cursor-pointer transition-all hover:shadow-lg hover:scale-105"
+          className="group cursor-pointer transition-all duration-300 hover:shadow-xl hover:shadow-primary/10 hover:-translate-y-1 border-2 hover:border-primary/20 animate-in fade-in slide-in-from-bottom-4"
+          style={{ animationDelay: `${index * 100}ms` }}
           onClick={stat.onClick}
         >
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-muted-foreground">{stat.title}</p>
-                <p className="text-3xl font-bold mt-2">{stat.value}</p>
+              <div className="space-y-1">
+                <p className="text-sm font-medium text-muted-foreground group-hover:text-foreground transition-colors">
+                  {stat.title}
+                </p>
+                <p className="text-3xl font-bold tracking-tight bg-gradient-to-br from-foreground to-foreground/70 bg-clip-text">
+                  {stat.value}
+                </p>
               </div>
-              <div className={`${stat.bgColor} p-3 rounded-xl`}>
+              <div className={`${stat.bgColor} p-3 rounded-xl group-hover:scale-110 transition-transform duration-300 shadow-sm`}>
                 <stat.icon className={`h-6 w-6 ${stat.color}`} />
               </div>
             </div>

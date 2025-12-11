@@ -76,50 +76,81 @@ export default function DashboardPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-[60vh]">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary" />
+      <div className="space-y-8 animate-in fade-in duration-500">
+        <div className="space-y-2">
+          <div className="h-10 w-64 bg-muted rounded-lg animate-pulse" />
+          <div className="h-6 w-96 bg-muted rounded-lg animate-pulse" />
+        </div>
+        
+        {/* Stats Cards Skeleton */}
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className="rounded-xl border bg-card p-6 shadow-sm">
+              <div className="h-4 w-24 bg-muted rounded animate-pulse mb-2" />
+              <div className="h-8 w-16 bg-muted rounded animate-pulse mb-1" />
+              <div className="h-3 w-32 bg-muted rounded animate-pulse" />
+            </div>
+          ))}
+        </div>
+
+        {/* Chart Skeleton */}
+        <div className="rounded-xl border bg-card p-6 shadow-sm">
+          <div className="h-6 w-48 bg-muted rounded animate-pulse mb-6" />
+          <div className="h-64 bg-muted rounded animate-pulse" />
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+      {/* Header with gradient */}
       <div className="space-y-2">
-        <h2 className="text-4xl font-bold tracking-tight">Dashboard</h2>
-        <p className="text-muted-foreground text-lg">Stok durumunuza genel bakış</p>
+        <h2 className="text-4xl font-bold tracking-tight bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+          Dashboard
+        </h2>
+        <p className="text-muted-foreground text-lg">
+          Stok durumunuza genel bakış
+        </p>
       </div>
 
-      <StatsCards stokDurumlari={stokDurumlari} hareketler={hareketler} />
+      <div className="animate-in fade-in slide-in-from-bottom-4 duration-700 delay-100">
+        <StatsCards stokDurumlari={stokDurumlari} hareketler={hareketler} />
+      </div>
 
-      <CriticalStockAlerts
-        stokDurumlari={stokDurumlari}
-        onViewAll={() => setIsCriticalModalOpen(true)}
-      />
+      <div className="animate-in fade-in slide-in-from-bottom-4 duration-700 delay-150">
+        <CriticalStockAlerts
+          stokDurumlari={stokDurumlari}
+          onViewAll={() => setIsCriticalModalOpen(true)}
+        />
+      </div>
 
       {/* Üst alan - Haftalık Chart (tam genişlik) */}
-      <div className="w-full">
+      <div className="w-full animate-in fade-in slide-in-from-bottom-4 duration-700 delay-200">
         <WeeklyChart hareketler={hareketler} />
       </div>
 
       {/* Alt alan - 3 sütunlu grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-300">
         {/* Hızlı İşlemler */}
-        <div>
+        <div className="transform transition-all hover:scale-[1.02] duration-200">
           <QuickActions />
         </div>
 
         {/* Hesap Makinesi */}
-        <div>
+        <div className="transform transition-all hover:scale-[1.02] duration-200">
           <StockCalculator />
         </div>
 
         {/* En Aktif Ürünler */}
-        <div>
+        <div className="transform transition-all hover:scale-[1.02] duration-200">
           <TopMoversWidget />
         </div>
       </div>
 
-      <RecentActivities hareketler={hareketler} sungerler={sungerler} />
+      <div className="animate-in fade-in slide-in-from-bottom-4 duration-700 delay-400">
+        <RecentActivities hareketler={hareketler} sungerler={sungerler} />
+      </div>
 
       <CriticalStockModal
         open={isCriticalModalOpen}
