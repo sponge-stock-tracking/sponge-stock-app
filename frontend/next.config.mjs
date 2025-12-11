@@ -6,6 +6,12 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
+  devIndicators: {
+    appIsrStatus: false,
+  },
+  experimental: {
+    devOverlays: false,
+  },
 }
 
 export default nextConfig
