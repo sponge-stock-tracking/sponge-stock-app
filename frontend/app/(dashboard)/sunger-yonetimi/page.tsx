@@ -189,22 +189,22 @@ export default function SungerYonetimiPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <Button variant="ghost" size="icon" onClick={() => router.push("/dashboard")}>
-                <ArrowLeft className="h-5 w-5" />
-              </Button>
-              <div>
-                <h2 className="text-3xl font-bold tracking-tight">Sünger Türü Yönetimi</h2>
-                <p className="text-muted-foreground mt-1">Sünger türlerini ekle, düzenle ve sil</p>
-              </div>
-            </div>
-            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-              <DialogTrigger asChild>
-                <Button onClick={() => handleOpenDialog()}>
-                  <Plus className="h-4 w-4 mr-2" />
-                  Yeni Sünger Türü
-                </Button>
-              </DialogTrigger>
+        <div className="flex items-center gap-4">
+          <Button variant="ghost" size="icon" onClick={() => router.push("/dashboard")}>
+            <ArrowLeft className="h-5 w-5" />
+          </Button>
+          <div>
+            <h2 className="text-3xl font-bold tracking-tight">Sünger Türü Yönetimi</h2>
+            <p className="text-muted-foreground mt-1">Sünger türlerini ekle, düzenle ve sil</p>
+          </div>
+        </div>
+        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+          <DialogTrigger asChild>
+            <Button onClick={() => handleOpenDialog()}>
+              <Plus className="h-4 w-4 mr-2" />
+              Yeni Sünger Türü
+            </Button>
+          </DialogTrigger>
               <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
                   <DialogTitle>{editingSunger ? "Sünger Türünü Düzenle" : "Yeni Sünger Türü Ekle"}</DialogTitle>
@@ -361,13 +361,13 @@ export default function SungerYonetimiPage() {
                 </form>
               </DialogContent>
             </Dialog>
-          </div>
+      </div>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Sünger Türleri</CardTitle>
-              <CardDescription>Sistemde kayıtlı tüm sünger türleri</CardDescription>
-            </CardHeader>
+      <Card>
+        <CardHeader>
+          <CardTitle>Sünger Türleri</CardTitle>
+          <CardDescription>Sistemde kayıtlı tüm sünger türleri</CardDescription>
+        </CardHeader>
             <CardContent>
               {loading ? (
                 <p className="text-center text-muted-foreground py-8">Yükleniyor...</p>
@@ -422,7 +422,6 @@ export default function SungerYonetimiPage() {
               )}
             </CardContent>
           </Card>
-        </main>
 
         <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
           <AlertDialogContent>
