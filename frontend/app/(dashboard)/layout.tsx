@@ -1,23 +1,44 @@
 "use client"
 
+import { useState } from "react"
 import { ProtectedRoute } from "@/components/protected-route"
-import { Navbar } from "@/components/navbar"
-import { Footer } from "@/components/footer"
+import { Sidebar } from "@/components/sidebar"
+import { RaporlarModal } from "@/components/modals/raporlar-modal"
+import { StokModal } from "@/components/modals/stok-modal"
+import { SungerYonetimiModal } from "@/components/modals/sunger-yonetimi-modal"
+import { StokGirisModal } from "@/components/modals/stok-giris-modal"
+import { StokCikisModal } from "@/components/modals/stok-cikis-modal"
 
 export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
+  const [raporlarOpen, setRaporlarOpen] = useState(false)
+  const [stokOpen, setStokOpen] = useState(false)
+  const [stokGirisOpen, setStokGirisOpen] = useState(false)
+  const [stokCikisOpen, setStokCikisOpen] = useState(false)
+  const [sungerYonetimiOpen, setSungerYonetimiOpen] = useState(false)
+
   return (
     <ProtectedRoute>
-      <div className="min-h-screen flex flex-col bg-background">
-        <Navbar />
-        <main className="flex-1 container mx-auto px-4 py-6 max-w-[1600px]">
+      <div className="min-h-screen flex bg-gradient-to-b from-[#052659] to-[#021024]">
+        <Sidebar
+          onStokGiris={() => setStokGirisOpen(true)}
+          onStokCikis={() => setStokCikisOpen(true)}
+          onStokGoruntule={() => setStokOpen(true)}
+          onRaporlar={() => setRaporlarOpen(true)}
+        />
+        <main className="flex-1 flex flex-col h-screen overflow-hidden">
           {children}
         </main>
-        <Footer />
       </div>
+
+      <RaporlarModal open={raporlarOpen} onOpenChange={setRaporlarOpen} />
+      <StokModal open={stokOpen} onOpenChange={setStokOpen} />
+      <StokGirisModal open={stokGirisOpen} onOpenChange={setStokGirisOpen} />
+      <StokCikisModal open={stokCikisOpen} onOpenChange={setStokCikisOpen} />
+      <SungerYonetimiModal open={sungerYonetimiOpen} onOpenChange={setSungerYonetimiOpen} />
     </ProtectedRoute>
   )
 }

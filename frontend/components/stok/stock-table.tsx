@@ -31,54 +31,54 @@ export function StockTable({ stoklar, onDetailClick }: StockTableProps) {
   }
 
   return (
-    <Card>
+    <Card className="border-0 shadow-lg">
       <CardContent className="p-0">
         <div className="overflow-x-auto">
           <Table>
             <TableHeader>
-              <TableRow>
-                <TableHead>Sünger Adı</TableHead>
-                <TableHead className="text-right">Toplam Giriş</TableHead>
-                <TableHead className="text-right">Toplam Çıkış</TableHead>
-                <TableHead className="text-right">Mevcut Stok</TableHead>
-                <TableHead className="text-right">Kritik Seviye</TableHead>
-                <TableHead className="text-center">Durum</TableHead>
-                <TableHead className="text-center">İşlemler</TableHead>
+              <TableRow className="bg-muted/50">
+                <TableHead className="px-6 py-4 text-base font-semibold min-w-[250px]">Sünger Adı</TableHead>
+                <TableHead className="text-right px-6 py-4 text-base font-semibold min-w-[120px]">Toplam Giriş</TableHead>
+                <TableHead className="text-right px-6 py-4 text-base font-semibold min-w-[120px]">Toplam Çıkış</TableHead>
+                <TableHead className="text-right px-6 py-4 text-base font-semibold min-w-[120px]">Mevcut Stok</TableHead>
+                <TableHead className="text-right px-6 py-4 text-base font-semibold min-w-[120px]">Kritik Seviye</TableHead>
+                <TableHead className="text-center px-6 py-4 text-base font-semibold min-w-[140px]">Durum</TableHead>
+                <TableHead className="text-center px-6 py-4 text-base font-semibold min-w-[140px]">İşlemler</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {stoklar.map((stok) => {
                 const status = getStockStatus(stok)
                 return (
-                  <TableRow key={stok.sponge_id}>
-                    <TableCell className="font-medium">{stok.name}</TableCell>
-                    <TableCell className="text-right text-muted-foreground">
+                  <TableRow key={stok.sponge_id} className="hover:bg-muted/30 transition-colors">
+                    <TableCell className="font-medium px-6 py-4 text-base">{stok.name}</TableCell>
+                    <TableCell className="text-right text-muted-foreground px-6 py-4 text-base">
                       {stok.total_in.toLocaleString("tr-TR")}
                     </TableCell>
-                    <TableCell className="text-right text-muted-foreground">
+                    <TableCell className="text-right text-muted-foreground px-6 py-4 text-base">
                       {stok.total_out.toLocaleString("tr-TR")}
                     </TableCell>
-                    <TableCell className="text-right">
-                      <span className="font-semibold">
+                    <TableCell className="text-right px-6 py-4">
+                      <span className="font-semibold text-base">
                         {stok.current_stock.toLocaleString("tr-TR")}
                       </span>
                     </TableCell>
-                    <TableCell className="text-right text-muted-foreground">
+                    <TableCell className="text-right text-muted-foreground px-6 py-4 text-base">
                       {stok.critical_stock.toLocaleString("tr-TR")}
                     </TableCell>
-                    <TableCell className="text-center">
+                    <TableCell className="text-center px-6 py-4">
                       <div className="flex items-center justify-center gap-2">
                         {status.variant === "default" ? (
-                          <CheckCircle className={`h-4 w-4 ${status.color}`} />
+                          <CheckCircle className={`h-5 w-5 ${status.color}`} />
                         ) : (
-                          <AlertCircle className={`h-4 w-4 ${status.color}`} />
+                          <AlertCircle className={`h-5 w-5 ${status.color}`} />
                         )}
-                        <Badge variant={status.variant}>{status.label}</Badge>
+                        <Badge variant={status.variant} className="text-sm px-3 py-1">{status.label}</Badge>
                       </div>
                     </TableCell>
-                    <TableCell className="text-center">
-                      <Button variant="ghost" size="sm" onClick={() => onDetailClick?.(stok.sponge_id)}>
-                        <Eye className="h-4 w-4 mr-2" />
+                    <TableCell className="text-center px-6 py-4">
+                      <Button variant="ghost" size="default" onClick={() => onDetailClick?.(stok.sponge_id)} className="gap-2">
+                        <Eye className="h-4 w-4" />
                         Detay Gör
                       </Button>
                     </TableCell>

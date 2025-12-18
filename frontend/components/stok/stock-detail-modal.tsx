@@ -59,9 +59,9 @@ export function StockDetailModal({ open, onOpenChange, sunger, hareketler }: Sto
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-3xl max-h-[85vh] flex flex-col">
-        <DialogHeader className="shrink-0">
-          <DialogTitle className="text-lg truncate pr-8">{sunger.name} - Stok Hareket Detayları</DialogTitle>
+      <DialogContent className="w-[95vw] max-w-[95vw] h-[95vh] max-h-[95vh] m-0 p-8 overflow-hidden flex flex-col">
+        <DialogHeader className="shrink-0 pb-6">
+          <DialogTitle className="text-2xl font-bold pr-8 mb-2">{sunger.name} - Stok Hareket Detayları</DialogTitle>
           <div className="flex flex-wrap gap-3 mt-2 text-sm text-muted-foreground">
             <span className="whitespace-nowrap">Yoğunluk: {sunger.density} kg/m³</span>
             <span className="whitespace-nowrap">Sertlik: {sunger.hardness === 'soft' ? 'Yumuşak' : sunger.hardness === 'medium' ? 'Orta' : 'Sert'}</span>
@@ -78,18 +78,18 @@ export function StockDetailModal({ open, onOpenChange, sunger, hareketler }: Sto
             ) : (
               <Table>
                 <TableHeader>
-                  <TableRow>
-                    <TableHead className="w-[140px]">Tarih</TableHead>
-                    <TableHead className="w-[100px]">İşlem Tipi</TableHead>
-                    <TableHead className="text-right w-[100px]">Miktar</TableHead>
-                    <TableHead className="text-right w-[100px]">Fiyat</TableHead>
-                    <TableHead className="min-w-[150px]">Not</TableHead>
+                  <TableRow className="bg-muted/50">
+                    <TableHead className="px-6 py-4 text-base font-semibold min-w-[180px]">Tarih</TableHead>
+                    <TableHead className="px-6 py-4 text-base font-semibold min-w-[130px]">İşlem Tipi</TableHead>
+                    <TableHead className="text-right px-6 py-4 text-base font-semibold min-w-[130px]">Miktar</TableHead>
+                    <TableHead className="text-right px-6 py-4 text-base font-semibold min-w-[130px]">Fiyat</TableHead>
+                    <TableHead className="px-6 py-4 text-base font-semibold min-w-[200px]">Not</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {sortedHareketler.map((hareket) => (
-                    <TableRow key={hareket.id}>
-                      <TableCell className="text-sm whitespace-nowrap">
+                    <TableRow key={hareket.id} className="hover:bg-muted/30 transition-colors">
+                      <TableCell className="px-6 py-4 text-base whitespace-nowrap">
                         {new Date(hareket.date).toLocaleDateString("tr-TR", {
                           day: "2-digit",
                           month: "short",
@@ -98,19 +98,19 @@ export function StockDetailModal({ open, onOpenChange, sunger, hareketler }: Sto
                           minute: "2-digit",
                         })}
                       </TableCell>
-                      <TableCell>
-                        <Badge variant={getTypeVariant(hareket.type)} className="gap-1 whitespace-nowrap">
+                      <TableCell className="px-6 py-4">
+                        <Badge variant={getTypeVariant(hareket.type)} className="gap-1 whitespace-nowrap text-sm px-3 py-1">
                           {getTypeIcon(hareket.type)}
                           {getTypeLabel(hareket.type)}
                         </Badge>
                       </TableCell>
-                      <TableCell className="text-right font-semibold whitespace-nowrap">
+                      <TableCell className="text-right px-6 py-4 font-semibold text-base whitespace-nowrap">
                         {hareket.quantity.toLocaleString("tr-TR")} {sunger.unit}
                       </TableCell>
-                      <TableCell className="text-right text-muted-foreground whitespace-nowrap">
+                      <TableCell className="text-right px-6 py-4 text-muted-foreground text-base whitespace-nowrap">
                         {hareket.price ? `₺${hareket.price.toLocaleString("tr-TR")}` : "-"}
                       </TableCell>
-                      <TableCell className="text-sm max-w-[200px] truncate" title={hareket.note || "-"}>
+                      <TableCell className="px-6 py-4 text-base max-w-[250px] truncate" title={hareket.note || "-"}>
                         {hareket.note || "-"}
                       </TableCell>
                     </TableRow>

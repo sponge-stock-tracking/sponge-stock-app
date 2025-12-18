@@ -69,17 +69,17 @@ export function StockForm({ type, sungerler, stokDurumlari, onSubmit }: StockFor
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-2xl">{type === "in" ? "Stok Giriş Formu" : "Stok Çıkış Formu"}</CardTitle>
-        <CardDescription>
+    <Card className="border-0 shadow-lg">
+      <CardHeader className="pb-6">
+        <CardTitle className="text-2xl mb-2">{type === "in" ? "Stok Giriş Formu" : "Stok Çıkış Formu"}</CardTitle>
+        <CardDescription className="text-base">
           {type === "in" ? "Yeni stok eklemek için formu doldurun" : "Stok çıkışı yapmak için formu doldurun"}
         </CardDescription>
       </CardHeader>
-      <CardContent>
+      <CardContent className="pt-0">
         <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="space-y-2">
-            <Label htmlFor="sunger">
+          <div className="space-y-3">
+            <Label htmlFor="sunger" className="text-base font-medium">
               Sünger Türü <span className="text-destructive">*</span>
             </Label>
             <Select 
@@ -110,8 +110,8 @@ export function StockForm({ type, sungerler, stokDurumlari, onSubmit }: StockFor
             </Alert>
           )}
 
-          <div className="space-y-2">
-            <Label htmlFor="miktar">
+          <div className="space-y-3">
+            <Label htmlFor="miktar" className="text-base font-medium">
               Miktar <span className="text-destructive">*</span>
             </Label>
             <Input
@@ -129,8 +129,8 @@ export function StockForm({ type, sungerler, stokDurumlari, onSubmit }: StockFor
             )}
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="aciklama">Not (İsteğe Bağlı)</Label>
+          <div className="space-y-3">
+            <Label htmlFor="aciklama" className="text-base font-medium">Not (İsteğe Bağlı)</Label>
             <Textarea
               id="aciklama"
               placeholder="Örn: Tedarikçi A'dan alınan parti"
@@ -148,7 +148,7 @@ export function StockForm({ type, sungerler, stokDurumlari, onSubmit }: StockFor
             </Alert>
           )}
 
-          <Button type="submit" className="w-full" size="lg" disabled={isSubmitting}>
+          <Button type="submit" className="w-full h-12 text-base" size="lg" disabled={isSubmitting}>
             {isSubmitting ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
