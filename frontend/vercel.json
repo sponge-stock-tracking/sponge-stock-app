@@ -1,7 +1,15 @@
 {
+  "framework": "nextjs",
+  "installCommand": "pnpm install --fetch-timeout=60000 --fetch-retries=5",
   "buildCommand": "pnpm run build",
   "devCommand": "pnpm run dev",
-  "installCommand": "pnpm install",
-  "framework": "nextjs",
-  "outputDirectory": ".next"
+  "outputDirectory": ".next",
+  "build": {
+    "env": {
+      "NODE_VERSION": "20.10.0",
+      "PNPM_VERSION": "9.6.0",
+      "NPM_CONFIG_REGISTRY": "https://registry.npmjs.org/",
+      "NPM_CONFIG_STRICT_SSL": "false"
+    }
+  }
 }
