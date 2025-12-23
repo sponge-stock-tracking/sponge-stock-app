@@ -140,7 +140,7 @@ export function AyarlarModal({ open, onOpenChange }: AyarlarModalProps) {
 
     try {
       setIsSubmitting(true)
-      
+
       const spongeData = {
         name: sungerFormData.name,
         density: densityNum,
@@ -213,7 +213,7 @@ export function AyarlarModal({ open, onOpenChange }: AyarlarModalProps) {
         password: formData.password,
         role: formData.role,
       }
-      
+
       await register(payload)
 
       toastHook({
@@ -229,9 +229,9 @@ export function AyarlarModal({ open, onOpenChange }: AyarlarModalProps) {
       })
     } catch (error: any) {
       console.error("Register error:", error)
-      
+
       let errorMessage = "Kullanıcı oluşturulamadı"
-      
+
       const detail = error.response?.data?.detail
       if (typeof detail === "string") {
         errorMessage = detail
@@ -241,7 +241,7 @@ export function AyarlarModal({ open, onOpenChange }: AyarlarModalProps) {
           return `${field}: ${err.msg}`
         }).join(", ")
       }
-      
+
       toastHook({
         title: "Hata",
         description: errorMessage,
@@ -256,27 +256,52 @@ export function AyarlarModal({ open, onOpenChange }: AyarlarModalProps) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="w-[95vw] max-w-[95vw] h-[95vh] max-h-[95vh] m-0 p-8 overflow-hidden flex flex-col">
-        <DialogHeader className="pb-6 flex-shrink-0">
-          <DialogTitle className="text-3xl font-bold mb-2 flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-primary/10">
-              <Settings className="h-6 w-6 text-primary" />
+      <DialogContent
+        className="w-[95vw] max-w-[1200px] max-h-[90vh] m-0 p-6 overflow-hidden flex flex-col"
+        style={{
+          background: 'linear-gradient(135deg, rgba(5, 38, 89, 0.98), rgba(2, 16, 36, 0.98))',
+          color: '#FFFFFF',
+          backdropFilter: 'blur(10px)',
+          boxShadow: '0 10px 40px rgba(0, 0, 0, 0.8)',
+          border: '1px solid rgba(193, 232, 255, 0.2)',
+          borderRadius: '18px'
+        }}
+      >
+        <DialogHeader className="pb-4 flex-shrink-0">
+          <DialogTitle
+            className="text-2xl font-bold mb-2 flex items-center gap-3"
+            style={{ color: '#C1E8FF' }}
+          >
+            <div className="p-2 rounded-lg" style={{ background: 'rgba(193, 232, 255, 0.1)' }}>
+              <Settings className="h-6 w-6" style={{ color: '#C1E8FF' }} />
             </div>
-            Ayarlar
+            AYARLAR
           </DialogTitle>
         </DialogHeader>
 
         <Tabs defaultValue="users" className="w-full flex-1 flex flex-col min-h-0">
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="users" className="gap-2">
+          <TabsList className="grid w-full grid-cols-3 mb-4" style={{
+            background: 'rgba(0, 0, 0, 0.3)',
+            borderRadius: '10px'
+          }}>
+            <TabsTrigger value="users" className="gap-2" style={{
+              color: '#C1E8FF',
+              borderRadius: '8px'
+            }}>
               <Users className="h-4 w-4" />
               Kullanıcı Yönetimi
             </TabsTrigger>
-            <TabsTrigger value="sponges" className="gap-2">
+            <TabsTrigger value="sponges" className="gap-2" style={{
+              color: '#C1E8FF',
+              borderRadius: '8px'
+            }}>
               <Package className="h-4 w-4" />
               Sünger Türleri
             </TabsTrigger>
-            <TabsTrigger value="general" className="gap-2">
+            <TabsTrigger value="general" className="gap-2" style={{
+              color: '#C1E8FF',
+              borderRadius: '8px'
+            }}>
               <Settings className="h-4 w-4" />
               Genel Ayarlar
             </TabsTrigger>
@@ -286,19 +311,25 @@ export function AyarlarModal({ open, onOpenChange }: AyarlarModalProps) {
             {isAdmin ? (
               <>
                 <div>
-                  <h3 className="text-xl font-semibold mb-4 flex items-center gap-2">
+                  <h3 className="text-xl font-semibold mb-4 flex items-center gap-2" style={{ color: '#C1E8FF' }}>
                     <UserPlus className="h-5 w-5" />
                     Yeni Kullanıcı Ekle
                   </h3>
-                  <p className="text-sm text-muted-foreground mb-6">
+                  <p className="text-sm mb-6" style={{ color: 'rgba(255, 255, 255, 0.7)' }}>
                     Sisteme yeni bir kullanıcı ekleyin. Oluşturduğunuz kullanıcı bilgileriyle giriş yapabilecek.
                   </p>
                 </div>
 
                 <form onSubmit={handleSubmit} className="space-y-5">
                   <div className="space-y-3">
-                    <Label htmlFor="username" className="text-base font-medium">
-                      Kullanıcı Adı <span className="text-destructive">*</span>
+                    <Label htmlFor="username" className="text-base font-medium" style={{
+                      display: 'block',
+                      marginBottom: '8px',
+                      fontWeight: 'bold',
+                      color: '#C1E8FF',
+                      fontSize: '0.9rem'
+                    }}>
+                      Kullanıcı Adı <span style={{ color: '#f87171' }}>*</span>
                     </Label>
                     <Input
                       id="username"
@@ -313,7 +344,13 @@ export function AyarlarModal({ open, onOpenChange }: AyarlarModalProps) {
                   </div>
 
                   <div className="space-y-3">
-                    <Label htmlFor="email" className="text-base font-medium">
+                    <Label htmlFor="email" className="text-base font-medium" style={{
+                      display: 'block',
+                      marginBottom: '8px',
+                      fontWeight: 'bold',
+                      color: '#C1E8FF',
+                      fontSize: '0.9rem'
+                    }}>
                       E-posta
                     </Label>
                     <Input
@@ -328,8 +365,14 @@ export function AyarlarModal({ open, onOpenChange }: AyarlarModalProps) {
                   </div>
 
                   <div className="space-y-3">
-                    <Label htmlFor="password" className="text-base font-medium">
-                      Şifre <span className="text-destructive">*</span>
+                    <Label htmlFor="password" className="text-base font-medium" style={{
+                      display: 'block',
+                      marginBottom: '8px',
+                      fontWeight: 'bold',
+                      color: '#C1E8FF',
+                      fontSize: '0.9rem'
+                    }}>
+                      Şifre <span style={{ color: '#f87171' }}>*</span>
                     </Label>
                     <Input
                       id="password"
@@ -345,7 +388,13 @@ export function AyarlarModal({ open, onOpenChange }: AyarlarModalProps) {
                   </div>
 
                   <div className="space-y-3">
-                    <Label htmlFor="role" className="text-base font-medium">
+                    <Label htmlFor="role" className="text-base font-medium" style={{
+                      display: 'block',
+                      marginBottom: '8px',
+                      fontWeight: 'bold',
+                      color: '#C1E8FF',
+                      fontSize: '0.9rem'
+                    }}>
                       Rol
                     </Label>
                     <Select
@@ -364,11 +413,29 @@ export function AyarlarModal({ open, onOpenChange }: AyarlarModalProps) {
                     </Select>
                   </div>
 
-                  <div className="flex gap-3 justify-end pt-4 border-t">
-                    <Button type="button" variant="outline" onClick={() => onOpenChange(false)} disabled={loading}>
+                  <div className="flex gap-3 justify-end pt-4" style={{ borderTop: '1px solid rgba(193, 232, 255, 0.2)' }}>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => onOpenChange(false)}
+                      disabled={loading}
+                      style={{
+                        background: 'rgba(193, 232, 255, 0.1)',
+                        color: '#C1E8FF',
+                        border: '1px solid rgba(193, 232, 255, 0.3)'
+                      }}
+                    >
                       İptal
                     </Button>
-                    <Button type="submit" disabled={loading} className="gap-2">
+                    <Button
+                      type="submit"
+                      disabled={loading}
+                      className="gap-2"
+                      style={{
+                        background: '#000000',
+                        color: 'white'
+                      }}
+                    >
                       {loading ? (
                         <>
                           <Loader2 className="h-4 w-4 animate-spin" />
@@ -415,17 +482,33 @@ export function AyarlarModal({ open, onOpenChange }: AyarlarModalProps) {
                     Yeni Sünger Türü
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="w-[90vw] max-w-[90vw] h-[90vh] max-h-[90vh] m-0 p-8 overflow-hidden flex flex-col">
-                  <DialogHeader className="pb-6 flex-shrink-0">
-                    <DialogTitle className="text-2xl font-bold mb-2">
+                <DialogContent
+                  className="w-[90vw] max-w-[900px] max-h-[90vh] m-0 p-6 overflow-hidden flex flex-col"
+                  style={{
+                    background: 'linear-gradient(135deg, rgba(5, 38, 89, 0.98), rgba(2, 16, 36, 0.98))',
+                    color: '#FFFFFF',
+                    backdropFilter: 'blur(10px)',
+                    boxShadow: '0 10px 40px rgba(0, 0, 0, 0.8)',
+                    border: '1px solid rgba(193, 232, 255, 0.2)',
+                    borderRadius: '18px'
+                  }}
+                >
+                  <DialogHeader className="pb-4 flex-shrink-0">
+                    <DialogTitle className="text-2xl font-bold mb-2" style={{ color: '#C1E8FF' }}>
                       {editingSunger ? "Sünger Türünü Düzenle" : "Yeni Sünger Türü Ekle"}
                     </DialogTitle>
                   </DialogHeader>
-                  <form onSubmit={handleSungerSubmit} className="space-y-5 flex-1 overflow-y-auto">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                  <form onSubmit={handleSungerSubmit} className="space-y-4 flex-1 overflow-y-auto">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className="space-y-3">
-                        <Label htmlFor="sunger-name" className="text-base font-medium">
-                          Sünger Adı <span className="text-destructive">*</span>
+                        <Label htmlFor="sunger-name" className="text-base font-medium" style={{
+                          display: 'block',
+                          marginBottom: '8px',
+                          fontWeight: 'bold',
+                          color: '#C1E8FF',
+                          fontSize: '0.9rem'
+                        }}>
+                          Sünger Adı <span style={{ color: '#f87171' }}>*</span>
                         </Label>
                         <Input
                           id="sunger-name"
@@ -459,8 +542,8 @@ export function AyarlarModal({ open, onOpenChange }: AyarlarModalProps) {
                         <Label htmlFor="sunger-hardness" className="text-base font-medium">
                           Sertlik <span className="text-destructive">*</span>
                         </Label>
-                        <Select 
-                          value={sungerFormData.hardness} 
+                        <Select
+                          value={sungerFormData.hardness}
                           onValueChange={(value) => setSungerFormData({ ...sungerFormData, hardness: value as SpongeHardness })}
                           disabled={isSubmitting}
                         >
@@ -479,8 +562,8 @@ export function AyarlarModal({ open, onOpenChange }: AyarlarModalProps) {
                         <Label htmlFor="sunger-unit" className="text-base font-medium">
                           Birim <span className="text-destructive">*</span>
                         </Label>
-                        <Select 
-                          value={sungerFormData.unit} 
+                        <Select
+                          value={sungerFormData.unit}
                           onValueChange={(value) => setSungerFormData({ ...sungerFormData, unit: value as SpongeUnit })}
                           disabled={isSubmitting}
                         >
@@ -614,7 +697,7 @@ export function AyarlarModal({ open, onOpenChange }: AyarlarModalProps) {
                             .filter(d => d !== null && d !== undefined)
                             .map(d => `${d}cm`)
                             .join(' × ') || '-'
-                          
+
                           return (
                             <TableRow key={sunger.id} className="hover:bg-muted/30 transition-colors">
                               <TableCell className="font-medium px-6 py-4 text-base">{sunger.name}</TableCell>

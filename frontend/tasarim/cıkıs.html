@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stok Çıkış Ekranı</title>
+    <style>
+        
+        body { 
+            margin: 0; 
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #021024; 
+            height: 100vh;
+        }
+
+        .note-modal-overlay { 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(0, 0, 0, 0.85); 
+            display: flex; 
+            justify-content: center; align-items: center; z-index: 1000; 
+        }
+
+       
+        .note-modal-content { 
+            background: linear-gradient(135deg, rgba(5, 38, 89, 0.98), rgba(2, 16, 36, 0.98)); 
+            color: #FFFFFF; padding: 30px; border-radius: 18px; width: 90%; max-width: 500px; 
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8); backdrop-filter: blur(10px); 
+            border: 1px solid rgba(193, 232, 255, 0.2); position: relative; 
+        }
+
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: bold; color: #C1E8FF; font-size: 0.9rem; }
+        .form-group label span { color: #f87171; }
+
+        .stok-input, .stok-select, .stok-textarea {
+            width: 100%; padding: 12px; border-radius: 10px; 
+            border: 1px solid rgba(193, 232, 255, 0.3); 
+            background: rgba(255, 255, 255, 0.05); color: white; 
+            font-size: 1rem; outline: none; box-sizing: border-box; transition: all 0.3s;
+        }
+
+        .stok-input:focus, .stok-select:focus, .stok-textarea:focus { 
+            border-color: #5483B3; background: rgba(255, 255, 255, 0.1); 
+        }
+
+        .stok-select option { background-color: #021024; color: white; }
+
+      
+        .btn-submit-stok { 
+            width: 100%; padding: 15px; background: #000000; color: white; 
+            border: none; border-radius: 10px; font-weight: bold; font-size: 1.1rem; 
+            cursor: pointer; margin-top: 10px; transition: 0.2s; 
+        }
+        .btn-submit-stok:hover { background: #222222; transform: scale(1.02); }
+
+        .close-btn { 
+            background: transparent; color: #C1E8FF; font-size: 1.5rem; 
+            position: absolute; top: 15px; right: 20px; border: none; cursor: pointer; 
+        }
+    </style>
+</head>
+<body>
+
+    <div class="note-modal-overlay" id="stokCikisModal">
+        <div class="note-modal-content">
+            <button class="close-btn" onclick="closeStokCikisModal()">&times;</button>
+            
+            <h2 style="margin-top: 0; color: #C1E8FF; margin-bottom: 25px;">Stok Çıkış Paneli</h2>
+            
+            <div class="form-group">
+                <label>Ürün Kodu <span>*</span></label>
+                <input type="text" class="stok-input" placeholder="Barkod okutun veya kod girin...">
+            </div>
+
+            <div class="form-group">
+                <label>Çıkış Miktarı</label>
+                <input type="number" class="stok-input" placeholder="0">
+            </div>
+
+            <div class="form-group">
+                <label>Açıklama</label>
+                <textarea class="stok-textarea" rows="2" placeholder="Neden çıkış yapılıyor?"></textarea>
+            </div>
+
+            <button class="btn-submit-stok" onclick="alert('İşlem Başarılı!')">Kaydı Tamamla</button>
+        </div>
+    </div>
+
+    <script>
+        
+
+        // Modalı Kapatma
+        function closeStokCikisModal() { 
+            document.getElementById('stokCikisModal').style.display = 'none'; 
+        }
+
+        // Modalı Açma 
+        function openStokCikisModal() { 
+            document.getElementById('stokCikisModal').style.display = 'flex'; 
+        }
+
+        
+        window.onclick = (e) => {
+            if (e.target.classList.contains('note-modal-overlay')) {
+                closeStokCikisModal();
+            }
+        }
+    </script>
+
+</body>
+</html>

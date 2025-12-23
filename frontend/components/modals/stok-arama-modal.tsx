@@ -59,20 +59,20 @@ export function StokAramaModal({ open, onOpenChange, searchTerm: initialSearchTe
     if (sponge) {
       try {
         setSelectedSponge(sponge)
-        
+
         const endDate = new Date()
         const startDate = new Date()
         startDate.setDate(startDate.getDate() - 30)
-        
+
         const allMovements = await getStockByDate(
           startDate.toISOString().split('T')[0],
           endDate.toISOString().split('T')[0]
         )
-        
+
         const spongeMovements = allMovements?.filter(
           (m: StockMovement) => m.sponge_id === spongeId
         ) || []
-        
+
         setSelectedHareketler(spongeMovements)
         setIsDetailModalOpen(true)
       } catch (error) {
@@ -85,9 +85,21 @@ export function StokAramaModal({ open, onOpenChange, searchTerm: initialSearchTe
   return (
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="w-[95vw] max-w-[95vw] h-[95vh] max-h-[95vh] m-0 p-8 overflow-hidden flex flex-col">
-          <DialogHeader className="pb-6 flex-shrink-0">
-            <DialogTitle className="text-3xl font-bold mb-2">Stok Arama</DialogTitle>
+        <DialogContent
+          className="w-[95vw] max-w-[1400px] max-h-[90vh] m-0 p-6 overflow-hidden flex flex-col"
+          style={{
+            background: 'linear-gradient(135deg, rgba(5, 38, 89, 0.98), rgba(2, 16, 36, 0.98))',
+            color: '#FFFFFF',
+            backdropFilter: 'blur(10px)',
+            boxShadow: '0 10px 40px rgba(0, 0, 0, 0.8)',
+            border: '1px solid rgba(193, 232, 255, 0.2)',
+            borderRadius: '18px'
+          }}
+        >
+          <DialogHeader className="pb-4 flex-shrink-0">
+            <DialogTitle className="text-2xl font-bold mb-2" style={{ color: '#C1E8FF' }}>
+              Stok Arama
+            </DialogTitle>
           </DialogHeader>
 
           <div className="space-y-6 flex-1 overflow-y-auto">

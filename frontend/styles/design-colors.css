@@ -1,0 +1,113 @@
+/* 🎨 TASARIM SİSTEMİ - RENK PALETİ VE DEĞİŞKENLER */
+/* Tasarim klasöründeki şablonlardan çıkarılmıştır */
+
+:root {
+  /* Ana Renk Paleti */
+  --bg-dark: #021024;
+  --bg-mid: #052659;
+  --bg-soft: #5483B3;
+  --bg-light: #7DA0CA;
+  --bg-very-light: #A3D5F5;
+  /* #C1E8FF yerine daha koyu */
+  --text-main: #F0F4F8;
+  /* #FFFFFF yerine daha koyu */
+  --text-muted: #B8C5D0;
+  /* Yeni: daha koyu gri */
+
+  /* Uyarı ve Durum Renkleri */
+  --alert-red: #ff6b6b;
+  --alert-yellow: #ffd93d;
+  --alert-green: #6bcf7f;
+  --alert-blue: #74b9ff;
+  --alert-bg: rgba(255, 255, 255, 0.2);
+  --calendar-active: #4CAF50;
+  --calendar-day-hover: rgba(255, 255, 255, 0.1);
+  --calendar-today: #7DA0CA;
+  --nav-button-hover: var(--bg-soft);
+
+  /* Gradient Tanımlamaları */
+  --gradient-primary: linear-gradient(180deg, var(--bg-mid), var(--bg-dark));
+  --gradient-card: linear-gradient(135deg, rgba(193, 232, 255, 0.35), rgba(125, 160, 202, 0.25));
+  --gradient-card-hover: linear-gradient(135deg, rgba(193, 232, 255, 0.55), rgba(125, 160, 202, 0.35));
+  --gradient-section: linear-gradient(135deg, rgba(193, 232, 255, 0.3), rgba(84, 131, 179, 0.25));
+  --gradient-modal: linear-gradient(135deg, rgba(5, 38, 89, 0.98), rgba(2, 16, 36, 0.98));
+
+  /* Shadow Değerleri */
+  --shadow-sm: 0 4px 10px rgba(0, 0, 0, 0.2);
+  --shadow-md: 0 10px 25px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 12px 35px rgba(0, 0, 0, 0.55);
+  --shadow-xl: 0 15px 35px rgba(0, 0, 0, 0.5);
+  --shadow-2xl: 0 0 40px rgba(0, 0, 0, 0.6);
+  --shadow-modal: 0 10px 40px rgba(0, 0, 0, 0.8);
+
+  /* Inset Shadow (İç Parıltı) */
+  --shadow-inset-sm: inset 0 1px 1px rgba(255, 255, 255, 0.35);
+  --shadow-inset-md: inset 0 1px 2px rgba(255, 255, 255, 0.6);
+
+  /* Border Radius Değerleri */
+  --radius-sm: 10px;
+  --radius-md: 12px;
+  --radius-lg: 18px;
+  --radius-xl: 20px;
+  --radius-2xl: 22px;
+  --radius-full: 50%;
+
+  /* Blur Değerleri */
+  --blur-sm: blur(10px);
+  --blur-md: blur(15px);
+  --blur-lg: blur(16px);
+  --blur-xl: blur(18px);
+
+  /* Transition Değerleri */
+  --transition-fast: 0.2s;
+  --transition-normal: 0.3s;
+  --transition-slow: 0.4s;
+
+  /* Opacity Değerleri */
+  --opacity-overlay: 0.85;
+  --opacity-card: 0.98;
+
+  /* Badge Renkleri */
+  --badge-critical-bg: rgba(248, 113, 113, 0.2);
+  --badge-critical-text: #f87171;
+  --badge-normal-bg: rgba(193, 232, 255, 0.2);
+  --badge-normal-text: #C1E8FF;
+  --badge-excess-bg: rgba(52, 211, 153, 0.2);
+  --badge-excess-text: #34d399;
+  --badge-warning-bg: rgba(251, 191, 36, 0.2);
+  --badge-warning-text: #fbbf24;
+  --badge-success-bg: rgba(52, 211, 153, 0.2);
+  --badge-success-text: #34d399;
+}
+
+/* Utility Classes */
+.design-gradient-primary {
+  background: var(--gradient-primary);
+}
+
+.design-gradient-card {
+  background: var(--gradient-card);
+  backdrop-filter: var(--blur-xl);
+}
+
+.design-gradient-card:hover {
+  background: var(--gradient-card-hover);
+}
+
+.design-shadow-card {
+  box-shadow: var(--shadow-md), var(--shadow-inset-sm);
+}
+
+.design-shadow-card:hover {
+  box-shadow: var(--shadow-xl), var(--shadow-inset-md);
+}
+
+.design-border-radius-card {
+  border-radius: var(--radius-lg);
+}
+
+.design-transition {
+  transition: transform var(--transition-normal),
+    box-shadow var(--transition-normal),
+    background var(--transition-normal);
+}

@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sünger Türü Yönetimi</title>
+    <style>
+        body { 
+            margin: 0; font-family: 'Segoe UI', sans-serif; 
+            background-color: #021024; color: #FFFFFF; padding: 20px;
+        }
+        .container { max-width: 1300px; margin: 0 auto; }
+        
+        /* HEADER */
+        .header-flex { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .page-title { color: #C1E8FF; font-size: 1.6rem; margin: 0; }
+
+        .btn-add {
+            background: #34d399; color: #021024; padding: 12px 20px; 
+            border: none; border-radius: 10px; font-weight: bold; 
+            cursor: pointer; display: flex; align-items: center; gap: 8px;
+            transition: 0.3s;
+        }
+        .btn-add:hover { background: #C1E8FF; }
+
+        /* ÖZET KARTLAR */
+        .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 25px; }
+        .stat-small {
+            background: rgba(255, 255, 255, 0.03); padding: 15px; border-radius: 12px;
+            border: 1px solid rgba(193, 232, 255, 0.1);
+        }
+        .stat-small span { display: block; font-size: 0.8rem; opacity: 0.6; }
+        .stat-small b { font-size: 1.2rem; color: #C1E8FF; }
+
+        /* TABLO ALANI */
+        .content-card {
+            background: rgba(5, 38, 89, 0.2); border-radius: 20px;
+            border: 1px solid rgba(193, 232, 255, 0.1); padding: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        .search-bar {
+            width: 100%; background: rgba(0,0,0,0.3); border: 1px solid rgba(193, 232, 255, 0.2);
+            padding: 12px; border-radius: 10px; color: white; margin-bottom: 20px; box-sizing: border-box;
+        }
+
+        table { width: 100%; border-collapse: collapse; text-align: left; }
+        th { padding: 15px; border-bottom: 2px solid rgba(193, 232, 255, 0.1); color: #C1E8FF; font-size: 0.9rem; }
+        td { padding: 15px; border-bottom: 1px solid rgba(193, 232, 255, 0.05); font-size: 0.9rem; }
+        tr:hover { background: rgba(193, 232, 255, 0.03); }
+
+        .badge {
+            padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: bold;
+        }
+        .bg-success { background: rgba(52, 211, 153, 0.2); color: #34d399; }
+        .bg-warning { background: rgba(251, 191, 36, 0.2); color: #fbbf24; }
+
+        .btn-action {
+            background: none; border: 1px solid rgba(255,255,255,0.2); color: white;
+            padding: 5px 10px; border-radius: 5px; cursor: pointer; font-size: 0.8rem;
+        }
+
+        /* MODAL */
+        .modal {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(2, 16, 36, 0.9); z-index: 1000; justify-content: center; align-items: center;
+        }
+        .modal-content {
+            background: #052659; padding: 30px; border-radius: 20px; width: 400px;
+            border: 1px solid #C1E8FF44;
+        }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; font-size: 0.9rem; opacity: 0.8; }
+        .form-group input, .form-group select {
+            width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #C1E8FF33;
+            background: #021024; color: white; box-sizing: border-box;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header-flex">
+        <div>
+            <h1 class="page-title">Sünger Türü Yönetimi</h1>
+            <p style="font-size: 0.8rem; opacity: 0.5; margin: 5px 0 0 0;">Sistemdeki bütün tanımlı sünger tiplerini yönetin.</p>
+        </div>
+        <button class="btn-add" onclick="toggleModal(true)">+ Yeni Tür Ekle</button>
+    </div>
+
+    <div class="stats-row">
+        <div class="stat-small"><span>Toplam Tür</span><b>12 Adet</b></div>
+        <div class="stat-small"><span>Aktif Kullanılan</span><b>8 Tür</b></div>
+        <div class="stat-small"><span>Kritik Stok</span><b style="color: #f87171;">2 Tür</b></div>
+        <div class="stat-small"><span>Son Eklenen</span><b>HR 35 Soft</b></div>
+    </div>
+
+    <div class="content-card">
+        <input type="text" class="search-bar" placeholder="Sünger türü veya kod ara...">
+        
+        <table>
+            <thead>
+                <tr>
+                    <th>Tür Kodu</th>
+                    <th>Sünger Adı</th>
+                    <th>Yoğunluk (DNS)</th>
+                    <th>Stok Durumu</th>
+                    <th>Birim</th>
+                    <th>İşlemler</th>
+                </tr>
+            </thead>
+            <tbody id="sungerTable">
+                <tr>
+                    <td>SNG-001</td>
+                    <td>32 DNS Standart</td>
+                    <td>32</td>
+                    <td><span class="badge bg-success">Yeterli</span></td>
+                    <td>Adet</td>
+                    <td>
+                        <button class="btn-action">Düzenle</button>
+                        <button class="btn-action" style="color:#f87171">Sil</button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>SNG-002</td>
+                    <td>28 DNS Yumuşak</td>
+                    <td>28</td>
+                    <td><span class="badge bg-warning">Kritik</span></td>
+                    <td>Adet</td>
+                    <td>
+                        <button class="btn-action">Düzenle</button>
+                        <button class="btn-action" style="color:#f87171">Sil</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="modal" id="addModal">
+    <div class="modal-content">
+        <h3 style="margin-top: 0; color: #C1E8FF;">Yeni Sünger Türü</h3>
+        <div class="form-group">
+            <label>Sünger Adı</label>
+            <input type="text" id="name" placeholder="Örn: 35 DNS HR">
+        </div>
+        <div class="form-group">
+            <label>Yoğunluk (DNS)</label>
+            <input type="number" id="dns" placeholder="Örn: 35">
+        </div>
+        <div class="form-group">
+            <label>Birim</label>
+            <select id="unit">
+                <option>Adet</option>
+                <option>Kg</option>
+                <option>m3</option>
+            </select>
+        </div>
+        <div style="display: flex; gap: 10px; margin-top: 25px;">
+            <button class="btn-add" style="flex: 1;" onclick="addSunger()">Kaydet</button>
+            <button class="btn-action" style="flex: 1;" onclick="toggleModal(false)">Vazgeç</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    function toggleModal(show) {
+        document.getElementById('addModal').style.display = show ? 'flex' : 'none';
+    }
+
+    function addSunger() {
+        const name = document.getElementById('name').value;
+        const dns = document.getElementById('dns').value;
+        const unit = document.getElementById('unit').value;
+
+        if(!name || !dns) { alert("Lütfen boş alanları doldurun!"); return; }
+
+        const table = document.getElementById('sungerTable');
+        const newRow = table.insertRow();
+        
+        newRow.innerHTML = `
+            <td>SNG-${Math.floor(Math.random()*1000)}</td>
+            <td>${name}</td>
+            <td>${dns}</td>
+            <td><span class="badge bg-success">Yeni</span></td>
+            <td>${unit}</td>
+            <td>
+                <button class="btn-action">Düzenle</button>
+                <button class="btn-action" style="color:#f87171">Sil</button>
+            </td>
+        `;
+
+        toggleModal(false);
+        // Formu temizle
+        document.getElementById('name').value = '';
+        document.getElementById('dns').value = '';
+    }
+</script>
+
+</body>
+</html>

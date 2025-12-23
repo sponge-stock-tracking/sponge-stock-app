@@ -69,21 +69,27 @@ export function StockForm({ type, sungerler, stokDurumlari, onSubmit }: StockFor
   }
 
   return (
-    <Card className="border-0 shadow-lg">
-      <CardHeader className="pb-6">
+    <Card className="border-0 shadow-none bg-transparent">
+      <CardHeader className="pb-0 hidden">
         <CardTitle className="text-2xl mb-2">{type === "in" ? "Stok Giriş Formu" : "Stok Çıkış Formu"}</CardTitle>
         <CardDescription className="text-base">
           {type === "in" ? "Yeni stok eklemek için formu doldurun" : "Stok çıkışı yapmak için formu doldurun"}
         </CardDescription>
       </CardHeader>
-      <CardContent className="pt-0">
+      <CardContent className="pt-0 px-0">
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-3">
-            <Label htmlFor="sunger" className="text-base font-medium">
-              Sünger Türü <span className="text-destructive">*</span>
+            <Label htmlFor="sunger" className="text-base font-medium" style={{
+              display: 'block',
+              marginBottom: '8px',
+              fontWeight: 'bold',
+              color: '#C1E8FF',
+              fontSize: '0.9rem'
+            }}>
+              Sünger Türü / Adı <span style={{ color: '#f87171' }}>*</span>
             </Label>
-            <Select 
-              value={spongeId?.toString() || ""} 
+            <Select
+              value={spongeId?.toString() || ""}
               onValueChange={(val) => setSpongeId(Number(val))}
               disabled={isSubmitting}
             >
@@ -111,8 +117,14 @@ export function StockForm({ type, sungerler, stokDurumlari, onSubmit }: StockFor
           )}
 
           <div className="space-y-3">
-            <Label htmlFor="miktar" className="text-base font-medium">
-              Miktar <span className="text-destructive">*</span>
+            <Label htmlFor="miktar" className="text-base font-medium" style={{
+              display: 'block',
+              marginBottom: '8px',
+              fontWeight: 'bold',
+              color: '#C1E8FF',
+              fontSize: '0.9rem'
+            }}>
+              Miktar <span style={{ color: '#f87171' }}>*</span>
             </Label>
             <Input
               id="miktar"
@@ -130,7 +142,13 @@ export function StockForm({ type, sungerler, stokDurumlari, onSubmit }: StockFor
           </div>
 
           <div className="space-y-3">
-            <Label htmlFor="aciklama" className="text-base font-medium">Not (İsteğe Bağlı)</Label>
+            <Label htmlFor="aciklama" className="text-base font-medium" style={{
+              display: 'block',
+              marginBottom: '8px',
+              fontWeight: 'bold',
+              color: '#C1E8FF',
+              fontSize: '0.9rem'
+            }}>Açıklama</Label>
             <Textarea
               id="aciklama"
               placeholder="Örn: Tedarikçi A'dan alınan parti"
@@ -148,7 +166,22 @@ export function StockForm({ type, sungerler, stokDurumlari, onSubmit }: StockFor
             </Alert>
           )}
 
-          <Button type="submit" className="w-full h-12 text-base" size="lg" disabled={isSubmitting}>
+          <Button
+            type="submit"
+            className="w-full text-base"
+            size="lg"
+            disabled={isSubmitting}
+            style={{
+              padding: '15px',
+              background: '#000000',
+              color: 'white',
+              borderRadius: '10px',
+              fontWeight: 'bold',
+              fontSize: '1.1rem',
+              marginTop: '10px',
+              transition: '0.2s'
+            }}
+          >
             {isSubmitting ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />

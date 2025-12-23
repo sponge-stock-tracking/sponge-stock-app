@@ -72,20 +72,20 @@ export function StokModal({ open, onOpenChange }: StokModalProps) {
     if (sponge) {
       try {
         setSelectedSponge(sponge)
-        
+
         const endDate = new Date()
         const startDate = new Date()
         startDate.setDate(startDate.getDate() - 30)
-        
+
         const allMovements = await getStockByDate(
           startDate.toISOString().split('T')[0],
           endDate.toISOString().split('T')[0]
         )
-        
+
         const spongeMovements = allMovements?.filter(
           (m: StockMovement) => m.sponge_id === spongeId
         ) || []
-        
+
         setSelectedHareketler(spongeMovements)
         setIsDetailModalOpen(true)
       } catch (error) {
@@ -108,21 +108,52 @@ export function StokModal({ open, onOpenChange }: StokModalProps) {
   return (
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="w-[95vw] max-w-[95vw] h-[95vh] max-h-[95vh] m-0 p-8 overflow-hidden flex flex-col">
-          <DialogHeader className="pb-6 flex-shrink-0">
-            <DialogTitle className="text-3xl font-bold mb-2">Stok Yönetimi</DialogTitle>
-            <p className="text-muted-foreground text-base">Tüm stokları görüntüle ve yönet</p>
+        <DialogContent
+          className="w-[98vw] max-h-[95vh] m-0 p-6 overflow-hidden flex flex-col"
+          style={{
+            background: 'linear-gradient(135deg, rgba(5, 38, 89, 0.98), rgba(2, 16, 36, 0.98))',
+            color: '#FFFFFF',
+            backdropFilter: 'blur(10px)',
+            boxShadow: '0 10px 40px rgba(0, 0, 0, 0.8)',
+            border: '1px solid rgba(193, 232, 255, 0.2)',
+            borderRadius: '18px',
+            maxWidth: '98vw'
+          }}
+        >
+          <DialogHeader className="pb-4 flex-shrink-0">
+            <DialogTitle className="text-2xl font-bold mb-2" style={{ color: '#C1E8FF' }}>
+              Stok Yönetimi
+            </DialogTitle>
+            <p className="text-base" style={{ color: 'rgba(255, 255, 255, 0.7)' }}>
+              Tüm stokları görüntüle ve yönet
+            </p>
           </DialogHeader>
 
-          <div className="space-y-6 flex-1 overflow-y-auto">
+          <div className="space-y-4 flex-1 overflow-y-auto">
             <div className="flex items-center justify-between pb-2">
               <div></div>
               <div className="flex gap-3">
-                <Button variant="outline" onClick={() => setIsGirisModalOpen(true)}>
+                <Button
+                  variant="outline"
+                  onClick={() => setIsGirisModalOpen(true)}
+                  style={{
+                    background: 'rgba(76, 175, 80, 0.1)',
+                    color: '#6bcf7f',
+                    border: '1px solid rgba(76, 175, 80, 0.3)'
+                  }}
+                >
                   <Plus className="h-4 w-4 mr-2" />
                   Stok Girişi
                 </Button>
-                <Button variant="outline" onClick={() => setIsCikisModalOpen(true)}>
+                <Button
+                  variant="outline"
+                  onClick={() => setIsCikisModalOpen(true)}
+                  style={{
+                    background: 'rgba(255, 107, 107, 0.1)',
+                    color: '#ff6b6b',
+                    border: '1px solid rgba(255, 107, 107, 0.3)'
+                  }}
+                >
                   <Minus className="h-4 w-4 mr-2" />
                   Stok Çıkışı
                 </Button>

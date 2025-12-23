@@ -41,7 +41,7 @@ export function RaporlarModal({ open, onOpenChange }: RaporlarModalProps) {
   const loadReportData = async () => {
     try {
       setLoading(true)
-      
+
       const [weekly, monthly, critical, summary] = await Promise.all([
         getWeeklyReport(),
         getMonthlyReport(),
@@ -113,9 +113,22 @@ export function RaporlarModal({ open, onOpenChange }: RaporlarModalProps) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="w-[95vw] max-w-[95vw] h-[95vh] max-h-[95vh] m-0 p-8 overflow-hidden flex flex-col">
-        <DialogHeader className="pb-6 flex-shrink-0">
-          <DialogTitle className="text-3xl font-bold mb-2">Raporlar</DialogTitle>
+      <DialogContent
+        className="w-[98vw] max-h-[95vh] m-0 p-6 overflow-hidden flex flex-col"
+        style={{
+          background: 'linear-gradient(135deg, rgba(5, 38, 89, 0.98), rgba(2, 16, 36, 0.98))',
+          color: '#FFFFFF',
+          backdropFilter: 'blur(10px)',
+          boxShadow: '0 10px 40px rgba(0, 0, 0, 0.8)',
+          border: '1px solid rgba(193, 232, 255, 0.2)',
+          borderRadius: '18px',
+          maxWidth: '98vw'
+        }}
+      >
+        <DialogHeader className="pb-4 flex-shrink-0">
+          <DialogTitle className="text-2xl font-bold mb-2" style={{ color: '#C1E8FF' }}>
+            Raporlar
+          </DialogTitle>
         </DialogHeader>
 
         <div className="flex-1 overflow-y-auto">
@@ -125,95 +138,94 @@ export function RaporlarModal({ open, onOpenChange }: RaporlarModalProps) {
             </div>
           ) : (
             <div className="space-y-6">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <Label htmlFor="period">Dönem:</Label>
-                <Select value={period} onValueChange={(val) => setPeriod(val as ReportPeriod)}>
-                  <SelectTrigger id="period" className="w-48">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="weekly">Haftalık (Son 7 Gün)</SelectItem>
-                    <SelectItem value="monthly">Aylık (Bu Ay)</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="flex gap-2">
-                {criticalStocks.length > 0 && (
-                  <Button variant="outline" onClick={handleNotifyCritical}>
-                    <Bell className="h-4 w-4 mr-2" />
-                    Kritik Stok Bildirimi
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <Label htmlFor="period">Dönem:</Label>
+                  <Select value={period} onValueChange={(val) => setPeriod(val as ReportPeriod)}>
+                    <SelectTrigger id="period" className="w-48">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="weekly">Haftalık (Son 7 Gün)</SelectItem>
+                      <SelectItem value="monthly">Aylık (Bu Ay)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="flex gap-2">
+                  {criticalStocks.length > 0 && (
+                    <Button variant="outline" onClick={handleNotifyCritical}>
+                      <Bell className="h-4 w-4 mr-2" />
+                      Kritik Stok Bildirimi
+                    </Button>
+                  )}
+                  <Button onClick={handleExport}>
+                    <Download className="h-4 w-4 mr-2" />
+                    Rapor İndir
                   </Button>
-                )}
-                <Button onClick={handleExport}>
-                  <Download className="h-4 w-4 mr-2" />
-                  Rapor İndir
-                </Button>
+                </div>
               </div>
-            </div>
 
-            {/* Özet Kartlar */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <Card>
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm font-medium text-muted-foreground">Toplam Giriş</p>
-                      <p className="text-3xl font-bold mt-2 text-green-600">{totalIn.toLocaleString("tr-TR")}</p>
+              {/* Özet Kartlar */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <Card>
+                  <CardContent className="p-6">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm font-medium text-muted-foreground">Toplam Giriş</p>
+                        <p className="text-3xl font-bold mt-2 text-green-600">{totalIn.toLocaleString("tr-TR")}</p>
+                      </div>
+                      <div className="bg-green-50 dark:bg-green-950 p-3 rounded-xl">
+                        <TrendingUp className="h-6 w-6 text-green-600" />
+                      </div>
                     </div>
-                    <div className="bg-green-50 dark:bg-green-950 p-3 rounded-xl">
-                      <TrendingUp className="h-6 w-6 text-green-600" />
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+                  </CardContent>
+                </Card>
 
-              <Card>
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm font-medium text-muted-foreground">Toplam Çıkış</p>
-                      <p className="text-3xl font-bold mt-2 text-red-600">{totalOut.toLocaleString("tr-TR")}</p>
+                <Card>
+                  <CardContent className="p-6">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm font-medium text-muted-foreground">Toplam Çıkış</p>
+                        <p className="text-3xl font-bold mt-2 text-red-600">{totalOut.toLocaleString("tr-TR")}</p>
+                      </div>
+                      <div className="bg-red-50 dark:bg-red-950 p-3 rounded-xl">
+                        <TrendingDown className="h-6 w-6 text-red-600" />
+                      </div>
                     </div>
-                    <div className="bg-red-50 dark:bg-red-950 p-3 rounded-xl">
-                      <TrendingDown className="h-6 w-6 text-red-600" />
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardContent className="p-6">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm font-medium text-muted-foreground">Net Değişim</p>
+                        <p
+                          className={`text-3xl font-bold mt-2 ${netChange >= 0 ? "text-blue-600" : "text-orange-600"
+                            }`}
+                        >
+                          {netChange.toLocaleString("tr-TR")}
+                        </p>
+                      </div>
+                      <div className="bg-blue-50 dark:bg-blue-950 p-3 rounded-xl">
+                        <Package className="h-6 w-6 text-blue-600" />
+                      </div>
                     </div>
-                  </div>
-                </CardContent>
-              </Card>
+                  </CardContent>
+                </Card>
+              </div>
 
-              <Card>
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm font-medium text-muted-foreground">Net Değişim</p>
-                      <p
-                        className={`text-3xl font-bold mt-2 ${
-                          netChange >= 0 ? "text-blue-600" : "text-orange-600"
-                        }`}
-                      >
-                        {netChange.toLocaleString("tr-TR")}
-                      </p>
-                    </div>
-                    <div className="bg-blue-50 dark:bg-blue-950 p-3 rounded-xl">
-                      <Package className="h-6 w-6 text-blue-600" />
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
+              {/* Grafikler */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <DailyTrendChart period={period} data={currentData} />
+                <StockDistributionChart stockSummary={stockSummary} />
+              </div>
 
-            {/* Grafikler */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <DailyTrendChart period={period} data={currentData} />
-              <StockDistributionChart stockSummary={stockSummary} />
-            </div>
+              <SpongeMovementChart data={currentData} />
 
-            <SpongeMovementChart data={currentData} />
-
-            {criticalStocks.length > 0 && (
-              <CriticalStockTable criticalStocks={criticalStocks} />
-            )}
+              {criticalStocks.length > 0 && (
+                <CriticalStockTable criticalStocks={criticalStocks} />
+              )}
             </div>
           )}
         </div>

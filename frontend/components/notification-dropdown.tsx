@@ -39,7 +39,7 @@ export function NotificationDropdown() {
 
   useEffect(() => {
     loadNotifications()
-    
+
     // Her 30 saniyede bir yenile
     const interval = setInterval(loadNotifications, 30000)
     return () => clearInterval(interval)
@@ -98,13 +98,13 @@ export function NotificationDropdown() {
   const getIcon = (type: string) => {
     switch (type) {
       case 'error':
-        return <AlertCircle className="h-4 w-4 text-red-500" />
+        return <AlertCircle className="h-4 w-4" style={{ color: '#ff6b6b' }} />
       case 'warning':
-        return <AlertTriangle className="h-4 w-4 text-yellow-500" />
+        return <AlertTriangle className="h-4 w-4" style={{ color: '#ffd93d' }} />
       case 'success':
-        return <Check className="h-4 w-4 text-green-500" />
+        return <Check className="h-4 w-4" style={{ color: '#6bcf7f' }} />
       default:
-        return <Info className="h-4 w-4 text-blue-500" />
+        return <Info className="h-4 w-4" style={{ color: '#74b9ff' }} />
     }
   }
 
@@ -121,77 +121,124 @@ export function NotificationDropdown() {
     if (diffHours < 24) return `${diffHours} saat önce`
     if (diffDays === 1) return 'Dün'
     if (diffDays < 7) return `${diffDays} gün önce`
-    
+
     return date.toLocaleDateString('tr-TR', { day: 'numeric', month: 'short', year: 'numeric' })
   }
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon" className="relative">
+        <Button
+          variant="ghost"
+          size="icon"
+          className="relative transition-all hover:scale-110"
+          style={{
+            color: '#C1E8FF'
+          }}
+        >
           <Bell className="h-5 w-5" />
           {unreadCount > 0 && (
-            <Badge className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs bg-destructive">
+            <Badge
+              className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs border-2"
+              style={{
+                background: '#f87171',
+                color: 'white',
+                borderColor: '#021024'
+              }}
+            >
               {unreadCount > 9 ? '9+' : unreadCount}
             </Badge>
           )}
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-80">
-        <DropdownMenuLabel className="flex items-center justify-between">
-          <span>Bildirimler</span>
+      <DropdownMenuContent
+        align="end"
+        className="w-96"
+        style={{
+          background: 'linear-gradient(135deg, rgba(5, 38, 89, 0.98), rgba(2, 16, 36, 0.98))',
+          backdropFilter: 'blur(10px)',
+          border: '1px solid rgba(193, 232, 255, 0.2)',
+          borderRadius: '12px',
+          boxShadow: '0 10px 40px rgba(0, 0, 0, 0.8)',
+          color: '#FFFFFF'
+        }}
+      >
+        <DropdownMenuLabel className="flex items-center justify-between py-3">
+          <span style={{ color: '#C1E8FF', fontWeight: 'bold', fontSize: '1rem' }}>Bildirimler</span>
           {unreadCount > 0 && (
             <Button
               variant="ghost"
               size="sm"
-              className="h-6 text-xs"
+              className="h-7 text-xs"
               onClick={handleMarkAllAsRead}
               disabled={loading}
+              style={{
+                background: 'rgba(193, 232, 255, 0.1)',
+                color: '#C1E8FF',
+                border: '1px solid rgba(193, 232, 255, 0.3)'
+              }}
             >
               <CheckCheck className="h-3 w-3 mr-1" />
               Tümünü Okundu İşaretle
             </Button>
           )}
         </DropdownMenuLabel>
-        <DropdownMenuSeparator />
-        
+        <DropdownMenuSeparator style={{ background: 'rgba(193, 232, 255, 0.2)' }} />
+
         {notifications.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-8 text-muted-foreground">
-            <Bell className="h-12 w-12 mb-2 opacity-20" />
-            <p className="text-sm">Bildirim bulunmuyor</p>
+          <div className="flex flex-col items-center justify-center py-10 text-center">
+            <Bell className="h-14 w-14 mb-3" style={{ opacity: 0.2, color: '#C1E8FF' }} />
+            <p className="text-sm" style={{ color: 'rgba(255, 255, 255, 0.6)' }}>Bildirim bulunmuyor</p>
+            <p className="text-xs mt-1" style={{ color: 'rgba(255, 255, 255, 0.4)' }}>
+              Yeni bildirimler burada görünecek
+            </p>
           </div>
         ) : (
-          <ScrollArea className="h-[400px]">
+          <ScrollArea className="h-[450px]">
             {notifications.map((notification) => (
               <DropdownMenuItem
                 key={notification.id}
                 className={cn(
-                  "flex items-start gap-3 p-3 cursor-pointer",
+                  "flex items-start gap-3 p-3 cursor-pointer transition-all my-1 mx-2 rounded-lg",
                   !notification.is_read && "bg-accent/50"
                 )}
+                style={{
+                  background: !notification.is_read
+                    ? 'rgba(193, 232, 255, 0.15)'
+                    : 'transparent',
+                  border: !notification.is_read
+                    ? '1px solid rgba(193, 232, 255, 0.2)'
+                    : '1px solid transparent'
+                }}
                 onClick={() => !notification.is_read && handleMarkAsRead(notification.id)}
               >
                 <div className="mt-0.5">{getIcon(notification.type)}</div>
                 <div className="flex-1 space-y-1">
                   <div className="flex items-start justify-between gap-2">
-                    <p className="text-sm font-medium leading-none">
+                    <p className="text-sm font-semibold leading-none" style={{ color: '#C1E8FF' }}>
                       {notification.title}
                     </p>
                     {!notification.is_read && (
-                      <div className="h-2 w-2 rounded-full bg-blue-500 flex-shrink-0 mt-1" />
+                      <div
+                        className="h-2 w-2 rounded-full flex-shrink-0 mt-1"
+                        style={{ background: '#4CAF50' }}
+                      />
                     )}
                   </div>
-                  <p className="text-xs text-muted-foreground line-clamp-2">
+                  <p className="text-xs line-clamp-2" style={{ color: 'rgba(255, 255, 255, 0.8)' }}>
                     {notification.message}
                   </p>
                   <div className="flex items-center justify-between pt-1">
-                    <p className="text-xs text-muted-foreground">
+                    <p className="text-xs" style={{ color: 'rgba(255, 255, 255, 0.5)' }}>
                       {formatDate(notification.created_at)}
                     </p>
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="h-6 w-6 p-0"
+                      className="h-6 w-6 p-0 transition-all hover:scale-110"
+                      style={{
+                        color: '#f87171'
+                      }}
                       onClick={(e) => {
                         e.stopPropagation()
                         handleDelete(notification.id)

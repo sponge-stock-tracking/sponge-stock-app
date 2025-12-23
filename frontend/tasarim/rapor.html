@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stok Analiz Merkezi</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { 
+            margin: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background-color: #021024; color: #FFFFFF; padding: 20px;
+        }
+        .container { max-width: 1300px; margin: 0 auto; }
+        
+        /* ÜST PANEL */
+        .header-flex { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .page-title { color: #C1E8FF; font-size: 1.6rem; margin: 0; }
+
+        .btn-filter, .btn-export {
+            background: #000000; color: #C1E8FF; padding: 10px 18px; 
+            border: 1px solid rgba(193, 232, 255, 0.3); border-radius: 10px;
+            font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 8px;
+        }
+
+        /* GRAFİK KARTLARI - 3 Sütunlu Yapı */
+        .charts-grid {
+            display: grid; 
+            grid-template-columns: 1fr 1fr 1fr; 
+            gap: 15px; 
+            margin-bottom: 25px;
+        }
+        .chart-card {
+            background: rgba(5, 38, 89, 0.2); border-radius: 20px;
+            border: 1px solid rgba(193, 232, 255, 0.1); padding: 20px;
+            backdrop-filter: blur(10px);
+            min-height: 320px;
+        }
+        .chart-card h4 { margin: 0 0 5px 0; color: #FFFFFF; font-size: 1rem; }
+        .chart-card p { margin: 0 0 15px 0; color: rgba(255,255,255,0.5); font-size: 0.8rem; }
+        .chart-container { position: relative; height: 200px; width: 100%; }
+
+        /* ÖZET KARTLAR */
+        .stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 25px; }
+        .stat-item {
+            background: rgba(255, 255, 255, 0.03); padding: 15px; border-radius: 15px;
+            border-left: 4px solid #C1E8FF;
+        }
+        .stat-label { font-size: 0.8rem; opacity: 0.6; margin-bottom: 5px; }
+        .stat-value { font-size: 1.4rem; font-weight: bold; color: #C1E8FF; }
+
+        /* DROPDOWN */
+        .dropdown { position: relative; }
+        .dropdown-content {
+            display: none; position: absolute; top: 45px; right: 0; width: 160px;
+            background: #052659; border-radius: 10px; z-index: 100; border: 1px solid #C1E8FF33;
+        }
+        .dropdown-content div { padding: 12px; cursor: pointer; font-size: 0.9rem; color: white; }
+        .dropdown-content div:hover { background: #C1E8FF22; color: #C1E8FF; }
+        .show { display: block; }
+
+        @media (max-width: 1100px) {
+            .charts-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header-flex">
+        <h1 class="page-title">Stok Takip Raporu</h1>
+        <div style="display: flex; gap: 10px;">
+            <div class="dropdown">
+                <button class="btn-filter" onclick="toggleDrop()">
+                    <span id="pText">Günlük Rapor</span> ▼
+                </button>
+                <div id="drop" class="dropdown-content">
+                    <div onclick="updateUI('daily', 'Günlük Rapor')">Günlük Rapor</div>
+                    <div onclick="updateUI('weekly', 'Haftalık Rapor')">Haftalık Rapor</div>
+                    <div onclick="updateUI('monthly', 'Aylık Rapor')">Aylık Rapor</div>
+                </div>
+            </div>
+            <button class="btn-export">📥 İndir</button>
+        </div>
+    </div>
+
+    <div class="stats-row">
+        <div class="stat-item"><div class="stat-label">Toplam Giriş</div><div class="stat-value" id="v1">2,600</div></div>
+        <div class="stat-item" style="border-color:#f87171"><div class="stat-label">Toplam Çıkış</div><div class="stat-value" style="color:#f87171" id="v2">450</div></div>
+        <div class="stat-item" style="border-color:#34d399"><div class="stat-label">Net Stok Artışı</div><div class="stat-value" style="color:#34d399" id="v3">+2,150</div></div>
+    </div>
+
+    <div class="charts-grid">
+        <div class="chart-card">
+            <h4>Hareket Trendi</h4>
+            <p>Zamana bağlı stok değişimi</p>
+            <div class="chart-container">
+                <canvas id="trendChart"></canvas>
+            </div>
+        </div>
+
+        <div class="chart-card">
+            <h4>Sünger Dağılımı</h4>
+            <p>Tür bazlı giriş/çıkış</p>
+            <div class="chart-container">
+                <canvas id="barChart"></canvas>
+            </div>
+        </div>
+
+        <div class="chart-card">
+            <h4>Depo Payı</h4>
+            <p>Ürünlerin stoktaki ağırlığı</p>
+            <div class="chart-container">
+                <canvas id="pieChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let trendObj, barObj, pieObj;
+
+    function toggleDrop() { document.getElementById("drop").classList.toggle("show"); }
+
+    function initCharts() {
+        const styleOptions = {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { position: 'bottom', labels: { color: '#FFF', padding: 15, font: { size: 10 } } }
+            }
+        };
+
+        // Trend Grafiği
+        trendObj = new Chart(document.getElementById('trendChart'), {
+            type: 'line',
+            data: {
+                labels: ['10 Ara', '11 Ara', '12 Ara', '13 Ara', '14 Ara', '15 Ara', '16 Ara'],
+                datasets: [
+                    { label: 'Giriş', data: [100, 2550, 400, 200, 100, 300, 50], borderColor: '#34d399', backgroundColor: '#34d39922', fill: true, tension: 0.4 },
+                    { label: 'Çıkış', data: [50, 80, 120, 100, 50, 40, 20], borderColor: '#f87171', backgroundColor: 'transparent', tension: 0.4 }
+                ]
+            },
+            options: { ...styleOptions, scales: { y: { grid: { color: '#ffffff11' }, ticks: { color: '#FFF' } }, x: { grid: { display: false }, ticks: { color: '#FFF' } } } }
+        });
+
+        // Bar Grafiği
+        barObj = new Chart(document.getElementById('barChart'), {
+            type: 'bar',
+            data: {
+                labels: ['32 DNS', '28 DNS', 'Döşeme', 'Visco', 'Koltuk'],
+                datasets: [
+                    { label: 'Giriş', data: [2000, 500, 50, 0, 20], backgroundColor: '#34d399', borderRadius: 5 },
+                    { label: 'Çıkış', data: [20, 10, 5, 40, 5], backgroundColor: '#f87171', borderRadius: 5 }
+                ]
+            },
+            options: { ...styleOptions, scales: { y: { grid: { color: '#ffffff11' }, ticks: { color: '#FFF' } }, x: { grid: { display: false }, ticks: { color: '#FFF' } } } }
+        });
+
+        // Yuvarlak (Doughnut) Grafik
+        pieObj = new Chart(document.getElementById('pieChart'), {
+            type: 'doughnut',
+            data: {
+                labels: ['32 DNS', '28 DNS', 'Diğer'],
+                datasets: [{
+                    data: [75, 15, 10],
+                    backgroundColor: ['#34d399', '#C1E8FF', '#052659'],
+                    borderColor: '#021024',
+                    borderWidth: 2
+                }]
+            },
+            options: { ...styleOptions, cutout: '65%' }
+        });
+    }
+
+    function updateUI(period, txt) {
+        document.getElementById("pText").innerText = txt;
+        document.getElementById("drop").classList.remove("show");
+        
+        if(period === 'weekly') {
+            trendObj.data.datasets[0].data = [800, 1500, 1200, 2200, 1800, 900, 400];
+            barObj.data.datasets[0].data = [1200, 900, 300, 100, 400];
+            pieObj.data.datasets[0].data = [60, 25, 15];
+            document.getElementById("v1").innerText = "7,200";
+        } else if(period === 'monthly') {
+            trendObj.data.datasets[0].data = [2000, 4000, 3500, 5000, 6500, 4000, 3000];
+            barObj.data.datasets[0].data = [4000, 2500, 1000, 500, 1500];
+            pieObj.data.datasets[0].data = [45, 35, 20];
+            document.getElementById("v1").innerText = "28,500";
+        } else {
+            trendObj.data.datasets[0].data = [100, 2550, 400, 200, 100, 300, 50];
+            barObj.data.datasets[0].data = [2000, 500, 50, 0, 20];
+            pieObj.data.datasets[0].data = [75, 15, 10];
+            document.getElementById("v1").innerText = "2,600";
+        }
+        
+        trendObj.update();
+        barObj.update();
+        pieObj.update();
+    }
+
+    window.onload = initCharts;
+</script>
+
+</body>
+</html>

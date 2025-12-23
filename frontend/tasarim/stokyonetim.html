@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stok Yönetimi | Pro</title>
+    <style>
+        body { 
+            margin: 0; font-family: 'Segoe UI', sans-serif; 
+            background-color: #021024; color: #FFFFFF; padding: 20px;
+        }
+        .container { max-width: 1000px; margin: 0 auto; }
+        .page-title { color: #C1E8FF; font-size: 1.8rem; margin-bottom: 25px; text-align: center; }
+
+        .controls-row { 
+            display: flex; justify-content: center; align-items: center; 
+            gap: 15px; margin-bottom: 30px; flex-wrap: wrap; 
+        }
+
+        .search-wrapper { position: relative; width: 300px; }
+        .stok-input {
+            width: 100%; padding: 12px 15px; border-radius: 10px; 
+            border: 1px solid rgba(193, 232, 255, 0.3); 
+            background: rgba(255, 255, 255, 0.05); color: white; 
+            font-size: 1rem; outline: none; box-sizing: border-box;
+        }
+
+        .dropdown { position: relative; display: inline-block; }
+
+        .btn-filter-main {
+            background: #000000; color: #C1E8FF; padding: 12px 20px; 
+            border: 1px solid rgba(193, 232, 255, 0.3); border-radius: 10px;
+            font-weight: bold; cursor: pointer; min-width: 180px;
+            display: flex; justify-content: space-between; align-items: center;
+            transition: 0.3s;
+        }
+        .btn-filter-main:hover { background: #111111; border-color: #5483B3; }
+
+        .dropdown-menu {
+            display: none; position: absolute; top: 110%; left: 0; 
+            width: 100%; background: rgba(5, 38, 89, 0.95); 
+            backdrop-filter: blur(15px); border-radius: 12px;
+            border: 1px solid rgba(193, 232, 255, 0.2);
+            z-index: 100; overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .dropdown-menu div {
+            padding: 12px 20px; color: white; cursor: pointer;
+            transition: 0.2s; font-size: 0.9rem;
+        }
+        .dropdown-menu div:hover { background: rgba(193, 232, 255, 0.1); color: #C1E8FF; }
+        
+        .show { display: block; }
+
+        .stok-table-container {
+            background: linear-gradient(135deg, rgba(5, 38, 89, 0.4), rgba(2, 16, 36, 0.4));
+            border-radius: 18px; border: 1px solid rgba(193, 232, 255, 0.1);
+            overflow: hidden; backdrop-filter: blur(10px);
+        }
+        table { width: 100%; border-collapse: collapse; }
+        th { background: rgba(0, 0, 0, 0.3); color: #C1E8FF; padding: 15px; text-align: left; }
+        
+        /* --- HOVER EFEKTİ GÜNCELLEMESİ --- */
+        tbody tr { 
+            transition: all 0.3s ease; 
+            cursor: pointer;
+            position: relative;
+        }
+
+        td { padding: 15px; border-bottom: 1px solid rgba(193, 232, 255, 0.05); }
+
+        /* Satır Üzerine Gelindiğinde */
+        tbody tr:hover {
+            background: rgba(193, 232, 255, 0.08); /* Hafif mavi parıltı */
+            box-shadow: inset 5px 0 0 0 #C1E8FF; /* Sol tarafa kalın açık mavi çizgi */
+        }
+        /* ---------------------------------- */
+
+        .badge { padding: 4px 10px; border-radius: 6px; font-size: 0.8rem; font-weight: bold; }
+        .critical { background: rgba(248, 113, 113, 0.2); color: #f87171; }
+        .normal { background: rgba(193, 232, 255, 0.2); color: #C1E8FF; }
+        .excess { background: rgba(52, 211, 153, 0.2); color: #34d399; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1 class="page-title">Depo Stok Yönetimi</h1>
+
+    <div class="controls-row">
+        <div class="search-wrapper">
+            <input type="text" id="searchInput" class="stok-input" placeholder="Sünger Adı.." onkeyup="renderTable()">
+        </div>
+
+        <div class="dropdown">
+            <button class="btn-filter-main" onclick="toggleDropdown()">
+                <span id="selectedFilterText">Tüm Stoklar</span>
+                <span>▼</span>
+            </button>
+            <div id="filterMenu" class="dropdown-menu">
+                <div onclick="selectFilter('all', 'Tüm Stoklar')">Tüm Stoklar</div>
+                <div onclick="selectFilter('critical', 'Kritik Stoklar')">Kritik Stoklar</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="stok-table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Ürün Adı</th>
+                    <th>Miktar</th>
+                    <th>Birim</th>
+                    <th>Durum</th>
+                </tr>
+            </thead>
+            <tbody id="stockTableBody">
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    const stockData = [
+        { name: "A Sünger 28 DNS", quantity: 8, unit: "Adet" },
+        { name: "B Sünger 32 DNS", quantity: 120, unit: "Adet" },
+        { name: "C Sünger", quantity: 50, unit: "Litre" },
+        { name: "D Sünger", quantity: 4, unit: "Metre" },
+        { name: "E Sünger", quantity: 200, unit: "Adet" }
+    ];
+
+    let currentFilter = 'all';
+
+    function toggleDropdown() {
+        document.getElementById("filterMenu").classList.toggle("show");
+    }
+
+    function selectFilter(filter, text) {
+        currentFilter = filter;
+        document.getElementById("selectedFilterText").innerText = text;
+        document.getElementById("filterMenu").classList.remove("show");
+        renderTable();
+    }
+
+    function renderTable() {
+        const tableBody = document.getElementById('stockTableBody');
+        const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+        tableBody.innerHTML = '';
+
+        stockData.forEach(item => {
+            const matchesSearch = item.name.toLowerCase().includes(searchTerm);
+            
+            let status = 'normal'; let statusText = 'Normal';
+            if (item.quantity <= 10) { status = 'critical'; statusText = 'Kritik'; }
+            else if (item.quantity >= 100) { status = 'excess'; statusText = 'Fazla'; }
+
+            let matchesFilter = (currentFilter === 'all') || 
+                                (currentFilter === 'critical' && item.quantity <= 10);
+
+            if (matchesSearch && matchesFilter) {
+                tableBody.innerHTML += `
+                    <tr>
+                        <td style="font-weight:bold; color:#C1E8FF;">${item.name}</td>
+                        <td>${item.quantity}</td>
+                        <td>${item.unit}</td>
+                        <td><span class="badge ${status}">${statusText}</span></td>
+                    </tr>
+                `;
+            }
+        });
+    }
+
+    window.onclick = function(event) {
+        if (!event.target.matches('.btn-filter-main') && !event.target.parentElement.matches('.btn-filter-main')) {
+            const dropdowns = document.getElementsByClassName("dropdown-menu");
+            for (let i = 0; i < dropdowns.length; i++) {
+                dropdowns[i].classList.remove('show');
+            }
+        }
+    }
+
+    renderTable();
+</script>
+
+</body>
+</html>
