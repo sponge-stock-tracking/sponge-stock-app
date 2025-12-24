@@ -36,6 +36,17 @@ def get_unread_count(
     return {"unread_count": count}
 
 
+@router.put("/mark-all-read", status_code=status.HTTP_200_OK)
+def mark_all_read(
+    user_id: Optional[int] = None,
+    db: Session = Depends(get_db)
+):
+    """Tüm bildirimleri okundu olarak işaretle"""
+    repo = NotificationRepository(db)
+    count = repo.mark_all_as_read(user_id=user_id)
+    return {"marked_count": count}
+
+
 @router.post("/", status_code=status.HTTP_201_CREATED, response_model=NotificationRead)
 def create_notification(
     notification: NotificationCreate,
@@ -58,17 +69,6 @@ def mark_notification_read(
         from fastapi import HTTPException
         raise HTTPException(status_code=404, detail="Bildirim bulunamadı")
     return notification
-
-
-@router.put("/mark-all-read", status_code=status.HTTP_200_OK)
-def mark_all_read(
-    user_id: Optional[int] = None,
-    db: Session = Depends(get_db)
-):
-    """Tüm bildirimleri okundu olarak işaretle"""
-    repo = NotificationRepository(db)
-    count = repo.mark_all_as_read(user_id=user_id)
-    return {"marked_count": count}
 
 
 @router.delete("/{notification_id}", status_code=status.HTTP_204_NO_CONTENT)
