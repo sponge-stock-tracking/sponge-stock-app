@@ -27,7 +27,7 @@ export function NotificationDropdown() {
   const loadNotifications = async () => {
     try {
       const [notifs, count] = await Promise.all([
-        getNotifications(undefined, 20),
+        getNotifications(20),
         getUnreadCount()
       ])
       setNotifications(notifs)

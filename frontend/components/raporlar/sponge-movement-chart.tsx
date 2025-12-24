@@ -64,11 +64,11 @@ export function SpongeMovementChart({ data }: SpongeMovementChartProps) {
         <ResponsiveContainer width="100%" height={300}>
           <BarChart data={chartData}>
             <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-            <XAxis 
-              dataKey="name" 
-              className="text-xs" 
-              angle={-45} 
-              textAnchor="end" 
+            <XAxis
+              dataKey="name"
+              className="text-xs"
+              angle={-45}
+              textAnchor="end"
               height={100}
               tick={{ fontSize: 11 }}
             />
@@ -81,17 +81,19 @@ export function SpongeMovementChart({ data }: SpongeMovementChartProps) {
               }}
             />
             <Legend />
-            <Bar 
-              dataKey="in" 
-              fill="#10b981" 
-              name="Giriş" 
-              radius={[4, 4, 0, 0]} 
+            <Bar
+              dataKey="in"
+              fill="#10b981"
+              name="Giriş"
+              radius={[4, 4, 0, 0]}
+              maxBarSize={50}
             />
-            <Bar 
-              dataKey="out" 
-              fill="#ef4444" 
-              name="Çıkış" 
-              radius={[4, 4, 0, 0]} 
+            <Bar
+              dataKey="out"
+              fill="#ef4444"
+              name="Çıkış"
+              radius={[4, 4, 0, 0]}
+              maxBarSize={50}
             />
           </BarChart>
         </ResponsiveContainer>

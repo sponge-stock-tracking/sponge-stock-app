@@ -21,12 +21,11 @@ export interface NotificationCreate {
 /**
  * Tüm bildirimleri getir
  */
-export async function getNotifications(userId?: number, limit: number = 50): Promise<Notification[]> {
+export async function getNotifications(limit: number = 50): Promise<Notification[]> {
   try {
     const params = new URLSearchParams();
-    if (userId) params.append('user_id', userId.toString());
     if (limit) params.append('limit', limit.toString());
-    
+
     const response = await api.get<Notification[]>(`/notifications/?${params.toString()}`);
     return response.data;
   } catch (error) {
@@ -38,10 +37,9 @@ export async function getNotifications(userId?: number, limit: number = 50): Pro
 /**
  * Okunmamış bildirim sayısını getir
  */
-export async function getUnreadCount(userId?: number): Promise<number> {
+export async function getUnreadCount(): Promise<number> {
   try {
-    const params = userId ? `?user_id=${userId}` : '';
-    const response = await api.get<{ unread_count: number }>(`/notifications/unread-count${params}`);
+    const response = await api.get<{ unread_count: number }>(`/notifications/unread-count`);
     return response.data.unread_count;
   } catch (error) {
     console.error('Okunmamış bildirim sayısı alınırken hata:', error);
@@ -78,10 +76,9 @@ export async function markAsRead(notificationId: number): Promise<Notification> 
 /**
  * Tüm bildirimleri okundu olarak işaretle
  */
-export async function markAllAsRead(userId?: number): Promise<number> {
+export async function markAllAsRead(): Promise<number> {
   try {
-    const params = userId ? `?user_id=${userId}` : '';
-    const response = await api.put<{ marked_count: number }>(`/notifications/mark-all-read${params}`);
+    const response = await api.put<{ marked_count: number }>(`/notifications/mark-all-read`);
     return response.data.marked_count;
   } catch (error) {
     console.error('Tüm bildirimler okundu olarak işaretlenirken hata:', error);

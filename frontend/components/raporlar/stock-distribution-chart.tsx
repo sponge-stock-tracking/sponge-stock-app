@@ -6,7 +6,17 @@ interface StockDistributionChartProps {
   stockSummary: StockSummaryItem[]
 }
 
-const COLORS = ["#2563eb", "#10b981", "#f59e0b", "#ef4444", "#8b5cf6", "#06b6d4", "#ec4899", "#84cc16"]
+// Premium cool spectrum palette
+const COLORS = [
+  "#3b82f6", // blue-500
+  "#06b6d4", // cyan-500
+  "#8b5cf6", // violet-500
+  "#6366f1", // indigo-500
+  "#14b8a6", // teal-500
+  "#ec4899", // pink-500
+  "#0ea5e9", // sky-500
+  "#a855f7"  // purple-500
+]
 
 export function StockDistributionChart({ stockSummary }: StockDistributionChartProps) {
   const chartData = stockSummary
@@ -46,7 +56,7 @@ export function StockDistributionChart({ stockSummary }: StockDistributionChartP
               cx="50%"
               cy="50%"
               labelLine={false}
-              label={(entry: any) => 
+              label={(entry: any) =>
                 `${entry.name}: ${(entry.percent * 100).toFixed(0)}%`
               }
               outerRadius={80}
@@ -57,14 +67,14 @@ export function StockDistributionChart({ stockSummary }: StockDistributionChartP
                 <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
               ))}
             </Pie>
-            <Tooltip 
+            <Tooltip
               contentStyle={{
                 backgroundColor: "hsl(var(--card))",
                 border: "1px solid hsl(var(--border))",
                 borderRadius: "var(--radius)",
               }}
             />
-            <Legend />
+            <Legend layout="vertical" verticalAlign="middle" align="right" />
           </PieChart>
         </ResponsiveContainer>
       </CardContent>

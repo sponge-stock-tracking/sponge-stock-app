@@ -3,13 +3,14 @@ from sqlalchemy.orm import Session
 from app.core.database import get_db
 from app.services.stock_service import StockService
 from app.services.report_service import ReportService
+from app.utils.auth import get_current_user
 import logging
 
 router = APIRouter(prefix="/chatbot", tags=["Chatbot"])
 logger = logging.getLogger(__name__)
 
 @router.get("/context")
-def get_chatbot_context(db: Session = Depends(get_db)):
+def get_chatbot_context(db: Session = Depends(get_db), current_user = Depends(get_current_user)):
     """
     Aggregates all necessary context data for the chatbot in a single request.
     """

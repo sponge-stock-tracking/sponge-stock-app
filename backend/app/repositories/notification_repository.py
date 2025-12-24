@@ -47,9 +47,16 @@ class NotificationRepository:
         
         return query.count()
 
-    def mark_as_read(self, notification_id: int) -> Optional[Notification]:
-        """Bildirimi okundu olarak işaretle"""
-        notification = self.db.query(Notification).filter(Notification.id == notification_id).first()
+    def mark_as_read(self, notification_id: int, user_id: int) -> Optional[Notification]:
+        """
+        Bildirimi okundu olarak işaretle.
+        Sadece kullanıcının kendi bildirimini işaretlemesine izin verilir.
+        """
+        notification = self.db.query(Notification).filter(
+            Notification.id == notification_id,
+            Notification.user_id == user_id
+        ).first()
+        
         if notification:
             notification.is_read = True
             notification.read_at = datetime.utcnow()
@@ -57,16 +64,16 @@ class NotificationRepository:
             self.db.refresh(notification)
         return notification
 
-    def mark_all_as_read(self, user_id: Optional[int] = None) -> int:
-        """Tüm bildirimleri okundu olarak işaretle"""
-        query = self.db.query(Notification).filter(Notification.is_read == False)
-        
-        if user_id:
-            query = query.filter(
-                (Notification.user_id == user_id) | (Notification.user_id.is_(None))
-            )
-        else:
-            query = query.filter(Notification.user_id.is_(None))
+    def mark_all_as_read(self, user_id: int) -> int:
+        """
+        Tüm KİŞİSEL bildirimleri okundu olarak işaretle.
+        Global bildirimler (user_id=None) etkilenmez çünkü başkasının verisini bozar.
+        """
+        # Sadece bu kullanıcıya ait olanları güncelle
+        query = self.db.query(Notification).filter(
+            Notification.is_read == False,
+            Notification.user_id == user_id
+        )
         
         count = query.update({
             "is_read": True,
@@ -75,9 +82,16 @@ class NotificationRepository:
         self.db.commit()
         return count
 
-    def delete(self, notification_id: int) -> bool:
-        """Bildirimi sil"""
-        notification = self.db.query(Notification).filter(Notification.id == notification_id).first()
+    def delete(self, notification_id: int, user_id: int) -> bool:
+        """
+        Bildirimi sil.
+        Sadece kullanıcının kendi bildirimini silmesine izin verilir.
+        """
+        notification = self.db.query(Notification).filter(
+            Notification.id == notification_id,
+            Notification.user_id == user_id
+        ).first()
+        
         if notification:
             self.db.delete(notification)
             self.db.commit()

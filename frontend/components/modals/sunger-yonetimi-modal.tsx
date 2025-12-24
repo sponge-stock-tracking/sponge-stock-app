@@ -372,45 +372,41 @@ export function SungerYonetimiModal({ open, onOpenChange }: SungerYonetimiModalP
                                         <Table>
                                             <TableHeader>
                                                 <TableRow className="bg-muted/50">
-                                                    <TableHead className="px-6 py-4 text-base font-semibold min-w-[250px]">Sünger Adı</TableHead>
-                                                    <TableHead className="px-6 py-4 text-base font-semibold min-w-[120px]">Dansite</TableHead>
-                                                    <TableHead className="px-6 py-4 text-base font-semibold min-w-[120px]">Sertlik</TableHead>
-                                                    <TableHead className="px-6 py-4 text-base font-semibold min-w-[100px]">Birim</TableHead>
-                                                    <TableHead className="px-6 py-4 text-base font-semibold min-w-[180px]">Ölçüler (G×Y×K)</TableHead>
-                                                    <TableHead className="text-right px-6 py-4 text-base font-semibold min-w-[130px]">Kritik Stok</TableHead>
-                                                    <TableHead className="text-right px-6 py-4 text-base font-semibold min-w-[140px]">İşlemler</TableHead>
+                                                    <TableHead className="px-4 py-3 font-semibold text-left">Sünger Adı</TableHead>
+                                                    <TableHead className="px-4 py-3 font-semibold text-center w-[100px]">Düzenle</TableHead>
+                                                    <TableHead className="px-4 py-3 font-semibold text-center w-[100px]">Sil</TableHead>
                                                 </TableRow>
                                             </TableHeader>
                                             <TableBody>
-                                                {sungerler.map((sunger) => {
-                                                    const hardnessLabel = sunger.hardness === 'soft' ? 'Yumuşak' : sunger.hardness === 'medium' ? 'Orta' : 'Sert'
-                                                    const dimensions = [sunger.width, sunger.height, sunger.thickness]
-                                                        .filter(d => d !== null && d !== undefined)
-                                                        .map(d => `${d}cm`)
-                                                        .join(' × ') || '-'
-
-                                                    return (
-                                                        <TableRow key={sunger.id} className="hover:bg-muted/30 transition-colors">
-                                                            <TableCell className="font-medium px-6 py-4 text-base">{sunger.name}</TableCell>
-                                                            <TableCell className="px-6 py-4 text-base">{sunger.density} kg/m³</TableCell>
-                                                            <TableCell className="px-6 py-4 text-base">{hardnessLabel}</TableCell>
-                                                            <TableCell className="px-6 py-4 text-base">{sunger.unit}</TableCell>
-                                                            <TableCell className="px-6 py-4 text-base">{dimensions}</TableCell>
-                                                            <TableCell className="text-right px-6 py-4 text-base">{sunger.critical_stock.toLocaleString("tr-TR")}</TableCell>
-                                                            <TableCell className="text-right px-6 py-4">
-                                                                <div className="flex justify-end gap-2">
-                                                                    <Button variant="ghost" size="default" onClick={() => handleOpenDialog(sunger)} className="gap-2">
-                                                                        <Pencil className="h-4 w-4" />
-                                                                        Düzenle
-                                                                    </Button>
-                                                                    <Button variant="ghost" size="default" onClick={() => handleDeleteClick(sunger.id)} className="gap-2 text-destructive hover:text-destructive">
-                                                                        <Trash2 className="h-4 w-4" />
-                                                                    </Button>
-                                                                </div>
-                                                            </TableCell>
-                                                        </TableRow>
-                                                    )
-                                                })}
+                                                {sungerler.map((sunger) => (
+                                                    <TableRow key={sunger.id} className="hover:bg-muted/30 transition-colors">
+                                                        <TableCell className="font-medium px-4 py-3 text-left">
+                                                            {sunger.name}
+                                                        </TableCell>
+                                                        <TableCell className="px-4 py-3 text-center">
+                                                            <Button
+                                                                variant="ghost"
+                                                                size="sm"
+                                                                onClick={() => handleOpenDialog(sunger)}
+                                                                className="h-8 w-full flex items-center justify-center gap-2 hover:bg-blue-500/10 hover:text-blue-400"
+                                                            >
+                                                                <Pencil className="h-4 w-4" />
+                                                                <span className="hidden sm:inline">Düzenle</span>
+                                                            </Button>
+                                                        </TableCell>
+                                                        <TableCell className="px-4 py-3 text-center">
+                                                            <Button
+                                                                variant="ghost"
+                                                                size="sm"
+                                                                onClick={() => handleDeleteClick(sunger.id)}
+                                                                className="h-8 w-full flex items-center justify-center gap-2 text-destructive hover:bg-destructive/10 hover:text-destructive"
+                                                            >
+                                                                <Trash2 className="h-4 w-4" />
+                                                                <span className="hidden sm:inline">Sil</span>
+                                                            </Button>
+                                                        </TableCell>
+                                                    </TableRow>
+                                                ))}
                                             </TableBody>
                                         </Table>
                                     </div>

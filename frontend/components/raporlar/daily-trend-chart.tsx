@@ -38,17 +38,17 @@ export function DailyTrendChart({ period, data }: DailyTrendChartProps) {
 
       // Günlük toplam hesapla
       const dailyMap = new Map<string, { in: number; out: number }>()
-      
+
       movements.forEach((movement: StockMovement) => {
         const dateKey = movement.date.split('T')[0]
         const current = dailyMap.get(dateKey) || { in: 0, out: 0 }
-        
+
         if (movement.type === 'in' || movement.type === 'return') {
           current.in += movement.quantity
         } else if (movement.type === 'out') {
           current.out += movement.quantity
         }
-        
+
         dailyMap.set(dateKey, current)
       })
 
@@ -59,7 +59,7 @@ export function DailyTrendChart({ period, data }: DailyTrendChartProps) {
         date.setDate(date.getDate() - i)
         const dateKey = date.toISOString().split('T')[0]
         const stats = dailyMap.get(dateKey) || { in: 0, out: 0 }
-        
+
         trend.push({
           date: date.toLocaleDateString("tr-TR", { day: "numeric", month: "short" }),
           in: stats.in,
@@ -101,8 +101,8 @@ export function DailyTrendChart({ period, data }: DailyTrendChartProps) {
         <ResponsiveContainer width="100%" height={300}>
           <LineChart data={chartData}>
             <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-            <XAxis 
-              dataKey="date" 
+            <XAxis
+              dataKey="date"
               className="text-xs"
               tick={{ fontSize: 12 }}
             />
@@ -115,18 +115,22 @@ export function DailyTrendChart({ period, data }: DailyTrendChartProps) {
               }}
             />
             <Legend />
-            <Line 
-              type="monotone" 
-              dataKey="in" 
-              stroke="#10b981" 
-              strokeWidth={2}
+            <Line
+              type="monotone"
+              dataKey="in"
+              stroke="#22d3ee" // cyan-400 (Brighter input)
+              strokeWidth={3}
+              dot={{ r: 4, fill: "#22d3ee", strokeWidth: 0 }}
+              activeDot={{ r: 6, fill: "#fff" }}
               name="Giriş"
             />
-            <Line 
-              type="monotone" 
-              dataKey="out" 
-              stroke="#ef4444" 
-              strokeWidth={2}
+            <Line
+              type="monotone"
+              dataKey="out"
+              stroke="#f87171" // red-400 (Brighter output)
+              strokeWidth={3}
+              dot={{ r: 4, fill: "#f87171", strokeWidth: 0 }}
+              activeDot={{ r: 6, fill: "#fff" }}
               name="Çıkış"
             />
           </LineChart>
