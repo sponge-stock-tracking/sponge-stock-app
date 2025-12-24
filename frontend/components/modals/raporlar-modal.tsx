@@ -284,5 +284,6 @@ export function RaporlarModal({ open, onOpenChange }: RaporlarModalProps) {
       </DialogContent>
     </Dialog>
   )
+}
 
 
