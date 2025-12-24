@@ -71,6 +71,8 @@ export function SpongeMovementChart({ data }: SpongeMovementChartProps) {
               textAnchor="end"
               height={100}
               tick={{ fontSize: 11 }}
+              tickFormatter={(value) => value.length > 20 ? `${value.substring(0, 20)}...` : value}
+              interval={0}
             />
             <YAxis className="text-xs" tick={{ fontSize: 12 }} />
             <Tooltip

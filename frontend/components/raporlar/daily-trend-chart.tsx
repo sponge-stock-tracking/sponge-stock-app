@@ -105,6 +105,7 @@ export function DailyTrendChart({ period, data }: DailyTrendChartProps) {
               dataKey="date"
               className="text-xs"
               tick={{ fontSize: 12 }}
+              minTickGap={30}
             />
             <YAxis className="text-xs" tick={{ fontSize: 12 }} />
             <Tooltip

@@ -1,13 +1,13 @@
 "use client"
+// Reports Modal - Tabs Removed
+
 
 import { useEffect, useState } from "react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Label } from "@/components/ui/label"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Download, TrendingUp, TrendingDown, Package, Bell, Loader2, FileBarChart, PieChart, Activity } from "lucide-react"
 import { getWeeklyReport, getMonthlyReport, getCriticalStocks } from "@/api/reports"
 import { getStockSummary } from "@/api/stocks"
@@ -16,7 +16,6 @@ import { useToast } from "@/hooks/use-toast"
 import { DailyTrendChart } from "@/components/raporlar/daily-trend-chart"
 import { StockDistributionChart } from "@/components/raporlar/stock-distribution-chart"
 import { SpongeMovementChart } from "@/components/raporlar/sponge-movement-chart"
-import { CriticalStockTable } from "@/components/raporlar/critical-stock-table"
 import { generatePDF } from "@/lib/pdf-generator"
 
 type ReportPeriod = "weekly" | "monthly"
@@ -196,172 +195,94 @@ export function RaporlarModal({ open, onOpenChange }: RaporlarModalProps) {
               </div>
             </div>
           ) : (
-            <Tabs defaultValue="overview" className="space-y-6">
-              <TabsList className="bg-slate-900/50 border border-slate-800 p-1 w-auto inline-flex">
-                <TabsTrigger value="overview" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white text-slate-400">Genel Bakış</TabsTrigger>
-                <TabsTrigger value="details" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white text-slate-400">Detaylı Tablo</TabsTrigger>
-                <TabsTrigger value="critical" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white text-slate-400">Kritik Stoklar</TabsTrigger>
-              </TabsList>
+            <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+              {/* Özet Kartlar */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <Card className="bg-gradient-to-br from-slate-900 to-slate-950 border-slate-800 shadow-xl overflow-hidden relative group">
+                  <div className="absolute inset-0 bg-green-500/5 group-hover:bg-green-500/10 transition-colors" />
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium text-slate-400">Toplam Giriş</CardTitle>
+                    <TrendingUp className="h-4 w-4 text-green-500" />
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-3xl font-bold text-green-500">{totalIn.toLocaleString("tr-TR")}</div>
+                    <p className="text-xs text-slate-500 mt-1">Birim ürün girişi</p>
+                  </CardContent>
+                </Card>
 
-              <TabsContent value="overview" className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-                {/* Özet Kartlar */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  <Card className="bg-gradient-to-br from-slate-900 to-slate-950 border-slate-800 shadow-xl overflow-hidden relative group">
-                    <div className="absolute inset-0 bg-green-500/5 group-hover:bg-green-500/10 transition-colors" />
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                      <CardTitle className="text-sm font-medium text-slate-400">Toplam Giriş</CardTitle>
-                      <TrendingUp className="h-4 w-4 text-green-500" />
-                    </CardHeader>
-                    <CardContent>
-                      <div className="text-3xl font-bold text-green-500">{totalIn.toLocaleString("tr-TR")}</div>
-                      <p className="text-xs text-slate-500 mt-1">Birim ürün girişi</p>
-                    </CardContent>
-                  </Card>
+                <Card className="bg-gradient-to-br from-slate-900 to-slate-950 border-slate-800 shadow-xl overflow-hidden relative group">
+                  <div className="absolute inset-0 bg-red-500/5 group-hover:bg-red-500/10 transition-colors" />
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium text-slate-400">Toplam Çıkış</CardTitle>
+                    <TrendingDown className="h-4 w-4 text-red-500" />
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-3xl font-bold text-red-500">{totalOut.toLocaleString("tr-TR")}</div>
+                    <p className="text-xs text-slate-500 mt-1">Birim ürün çıkışı</p>
+                  </CardContent>
+                </Card>
 
-                  <Card className="bg-gradient-to-br from-slate-900 to-slate-950 border-slate-800 shadow-xl overflow-hidden relative group">
-                    <div className="absolute inset-0 bg-red-500/5 group-hover:bg-red-500/10 transition-colors" />
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                      <CardTitle className="text-sm font-medium text-slate-400">Toplam Çıkış</CardTitle>
-                      <TrendingDown className="h-4 w-4 text-red-500" />
-                    </CardHeader>
-                    <CardContent>
-                      <div className="text-3xl font-bold text-red-500">{totalOut.toLocaleString("tr-TR")}</div>
-                      <p className="text-xs text-slate-500 mt-1">Birim ürün çıkışı</p>
-                    </CardContent>
-                  </Card>
+                <Card className="bg-gradient-to-br from-slate-900 to-slate-950 border-slate-800 shadow-xl overflow-hidden relative group">
+                  <div className={`absolute inset-0 transition-colors ${netChange >= 0 ? "bg-blue-500/5 group-hover:bg-blue-500/10" : "bg-orange-500/5 group-hover:bg-orange-500/10"}`} />
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium text-slate-400">Net Değişim</CardTitle>
+                    <Activity className={`h-4 w-4 ${netChange >= 0 ? "text-blue-500" : "text-orange-500"}`} />
+                  </CardHeader>
+                  <CardContent>
+                    <div className={`text-3xl font-bold ${netChange >= 0 ? "text-blue-500" : "text-orange-500"}`}>
+                      {netChange.toLocaleString("tr-TR")}
+                    </div>
+                    <p className="text-xs text-slate-500 mt-1">Giriş vs Çıkış dengesi</p>
+                  </CardContent>
+                </Card>
+              </div>
 
-                  <Card className="bg-gradient-to-br from-slate-900 to-slate-950 border-slate-800 shadow-xl overflow-hidden relative group">
-                    <div className={`absolute inset-0 transition-colors ${netChange >= 0 ? "bg-blue-500/5 group-hover:bg-blue-500/10" : "bg-orange-500/5 group-hover:bg-orange-500/10"}`} />
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                      <CardTitle className="text-sm font-medium text-slate-400">Net Değişim</CardTitle>
-                      <Activity className={`h-4 w-4 ${netChange >= 0 ? "text-blue-500" : "text-orange-500"}`} />
-                    </CardHeader>
-                    <CardContent>
-                      <div className={`text-3xl font-bold ${netChange >= 0 ? "text-blue-500" : "text-orange-500"}`}>
-                        {netChange.toLocaleString("tr-TR")}
-                      </div>
-                      <p className="text-xs text-slate-500 mt-1">Giriş vs Çıkış dengesi</p>
-                    </CardContent>
-                  </Card>
-                </div>
-
-                {/* Grafikler Grid */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                  <Card className="bg-slate-900/50 border-slate-800 shadow-xl col-span-1">
-                    <CardHeader>
-                      <CardTitle className="text-lg text-slate-200 flex items-center gap-2">
-                        <TrendingUp className="h-5 w-5 text-blue-400" />
-                        Günlük Trend Analizi
-                      </CardTitle>
-                      <CardDescription>Seçili dönemdeki günlük hareket dağılımı</CardDescription>
-                    </CardHeader>
-                    <CardContent className="h-[400px]">
-                      <DailyTrendChart period={period} data={currentData} />
-                    </CardContent>
-                  </Card>
-
-                  <Card className="bg-slate-900/50 border-slate-800 shadow-xl col-span-1">
-                    <CardHeader>
-                      <CardTitle className="text-lg text-slate-200 flex items-center gap-2">
-                        <PieChart className="h-5 w-5 text-purple-400" />
-                        Stok Dağılımı
-                      </CardTitle>
-                      <CardDescription>Mevcut ürünlerin stoğa göre dağılımı</CardDescription>
-                    </CardHeader>
-                    <CardContent className="h-[400px]">
-                      <StockDistributionChart stockSummary={stockSummary} />
-                    </CardContent>
-                  </Card>
-
-                  <Card className="bg-slate-900/50 border-slate-800 shadow-xl col-span-1 lg:col-span-2">
-                    <CardHeader>
-                      <CardTitle className="text-lg text-slate-200 flex items-center gap-2">
-                        <Activity className="h-5 w-5 text-green-400" />
-                        Sünger Hareket Analizi
-                      </CardTitle>
-                      <CardDescription>Sünger bazında giriş/çıkış karşılaştırması</CardDescription>
-                    </CardHeader>
-                    <CardContent className="h-[450px]">
-                      <SpongeMovementChart data={currentData} />
-                    </CardContent>
-                  </Card>
-                </div>
-              </TabsContent>
-
-              <TabsContent value="details" className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-                <Card className="bg-slate-900/50 border-slate-800 shadow-xl">
+              {/* Grafikler Grid */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <Card className="bg-slate-900/50 border-slate-800 shadow-xl col-span-1">
                   <CardHeader>
-                    <CardTitle className="text-lg text-slate-200">Detaylı Veri Tablosu</CardTitle>
-                    <CardDescription>Gün bazında hareket detayları</CardDescription>
+                    <CardTitle className="text-lg text-slate-200 flex items-center gap-2">
+                      <TrendingUp className="h-5 w-5 text-blue-400" />
+                      Günlük Trend Analizi
+                    </CardTitle>
+                    <CardDescription>Seçili dönemdeki günlük hareket dağılımı</CardDescription>
                   </CardHeader>
-                  <CardContent>
-                    <div className="rounded-md border border-slate-800">
-                      <Table>
-                        <TableHeader className="bg-slate-900">
-                          <TableRow className="hover:bg-transparent border-slate-800">
-                            <TableHead className="text-slate-300">Tarih</TableHead>
-                            <TableHead className="text-slate-300 text-right">Giriş Miktarı</TableHead>
-                            <TableHead className="text-slate-300 text-right">Çıkış Miktarı</TableHead>
-                            <TableHead className="text-slate-300 text-right">Net Değişim</TableHead>
-                          </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                          {(currentData as any)?.daily_trends?.map((day: any, idx: number) => (
-                            <TableRow key={idx} className="border-slate-800 hover:bg-slate-800/50">
-                              <TableCell className="font-medium text-slate-300">{day.date}</TableCell>
-                              <TableCell className="text-green-400 text-right">+{day.in_count}</TableCell>
-                              <TableCell className="text-red-400 text-right">-{day.out_count}</TableCell>
-                              <TableCell className={`text-right font-bold ${day.in_count - day.out_count >= 0 ? "text-blue-400" : "text-orange-400"}`}>
-                                {day.in_count - day.out_count}
-                              </TableCell>
-                            </TableRow>
-                          ))}
-                          {(!(currentData as any)?.daily_trends || (currentData as any).daily_trends.length === 0) && (
-                            <TableRow>
-                              <TableCell colSpan={4} className="text-center py-8 text-slate-500">Bu dönem için veri bulunamadı.</TableCell>
-                            </TableRow>
-                          )}
-                        </TableBody>
-                      </Table>
-                    </div>
+                  <CardContent className="h-[400px]">
+                    <DailyTrendChart period={period} data={currentData} />
                   </CardContent>
                 </Card>
-              </TabsContent>
 
-              <TabsContent value="critical" className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-                <Card className="bg-slate-900/50 border-slate-800 shadow-xl">
-                  <CardHeader className="flex flex-row items-center justify-between">
-                    <div>
-                      <CardTitle className="text-lg text-slate-200 flex items-center gap-2">
-                        <Bell className="h-5 w-5 text-red-500" />
-                        Kritik Stok Listesi
-                      </CardTitle>
-                      <CardDescription>Stok seviyesi kritik olan ürünler</CardDescription>
-                    </div>
-                    {criticalStocks.length > 0 && (
-                      <Button variant="outline" onClick={handleNotifyCritical} className="text-red-400 border-red-900/50 hover:bg-red-900/20">
-                        Herkese Bildir
-                      </Button>
-                    )}
+                <Card className="bg-slate-900/50 border-slate-800 shadow-xl col-span-1">
+                  <CardHeader>
+                    <CardTitle className="text-lg text-slate-200 flex items-center gap-2">
+                      <PieChart className="h-5 w-5 text-purple-400" />
+                      Stok Dağılımı
+                    </CardTitle>
+                    <CardDescription>Mevcut ürünlerin stoğa göre dağılımı</CardDescription>
                   </CardHeader>
-                  <CardContent>
-                    {(criticalStocks && criticalStocks.length > 0) ? (
-                      <CriticalStockTable criticalStocks={criticalStocks} />
-                    ) : (
-                      <div className="flex flex-col items-center justify-center py-12 text-slate-500">
-                        <Package className="h-12 w-12 mb-4 opacity-50" />
-                        <p>Kritik seviyede ürün bulunmuyor.</p>
-                      </div>
-                    )}
+                  <CardContent className="h-[400px]">
+                    <StockDistributionChart stockSummary={stockSummary} />
                   </CardContent>
                 </Card>
-              </TabsContent>
-            </Tabs>
+
+                <Card className="bg-slate-900/50 border-slate-800 shadow-xl col-span-1 lg:col-span-2">
+                  <CardHeader>
+                    <CardTitle className="text-lg text-slate-200 flex items-center gap-2">
+                      <Activity className="h-5 w-5 text-green-400" />
+                      Sünger Hareket Analizi
+                    </CardTitle>
+                    <CardDescription>Sünger bazında giriş/çıkış karşılaştırması</CardDescription>
+                  </CardHeader>
+                  <CardContent className="h-[450px]">
+                    <SpongeMovementChart data={currentData} />
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
           )}
         </div>
       </DialogContent>
     </Dialog>
   )
-}
 
 

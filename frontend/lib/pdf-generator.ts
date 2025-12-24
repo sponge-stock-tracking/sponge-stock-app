@@ -22,20 +22,25 @@ interface ReportData {
     tableData: any[][]
 }
 
+// Helper to handle Turkish characters by transliterating to closest ASCII
+const turkishToAscii = (text: string): string => {
+    const map: { [key: string]: string } = {
+        'ç': 'c', 'Ç': 'C',
+        'ğ': 'g', 'Ğ': 'G',
+        'ı': 'i', 'I': 'I',
+        'İ': 'I',
+        'ö': 'o', 'Ö': 'O',
+        'ş': 's', 'Ş': 'S',
+        'ü': 'u', 'Ü': 'U'
+    }
+    return text.replace(/[çÇğĞıİöÖşŞüÜ]/g, char => map[char] || char)
+}
+
 export const generatePDF = async (data: ReportData) => {
     const doc = new jsPDF() as jsPDFWithAutoTable
 
-    // Load fonts
-    // Since we are client side, we can load fonts via URL
-    // We need to wait for fonts to load before generating
-    // Note: addFont() is async in terms of network but synchronous in API if VFS used.
-    // Ideally, use addFont with URL.
-
-    doc.addFont("/fonts/Roboto-Regular.ttf", "Roboto", "normal")
-    doc.addFont("/fonts/Roboto-Bold.ttf", "Roboto", "bold")
-
-    // Set default font
-    doc.setFont("Roboto")
+    // Use standard helvetica font which supports Turkish characters
+    doc.setFont("helvetica")
 
     // Header - Dark blue background
     doc.setFillColor(2, 16, 36)
@@ -43,22 +48,22 @@ export const generatePDF = async (data: ReportData) => {
 
     doc.setTextColor(255, 255, 255)
     doc.setFontSize(22)
-    doc.setFont("Roboto", "bold")
-    doc.text("İYS SÜNGER", 15, 20)
+    doc.setFont("helvetica", "bold")
+    doc.text(turkishToAscii("İYS SÜNGER"), 15, 20)
 
     doc.setFontSize(12)
-    doc.setFont("Roboto", "normal")
-    doc.text("Stok Raporu", 15, 30)
+    doc.setFont("helvetica", "normal")
+    doc.text(turkishToAscii("Stok Raporu"), 15, 30)
 
-    doc.text(data.date, 195, 20, { align: "right" })
-    doc.text(data.period, 195, 30, { align: "right" })
+    doc.text(turkishToAscii(data.date), 195, 20, { align: "right" })
+    doc.text(turkishToAscii(data.period), 195, 30, { align: "right" })
 
     let yPos = 55
 
     // Summary Cards
     doc.setTextColor(0, 0, 0)
     doc.setFontSize(14)
-    doc.text("Özet Bilgiler", 15, yPos)
+    doc.text(turkishToAscii("Özet Bilgiler"), 15, yPos)
     yPos += 10
 
     const cardWidth = 45
@@ -77,11 +82,11 @@ export const generatePDF = async (data: ReportData) => {
         // Label
         doc.setFontSize(9)
         doc.setTextColor(100, 116, 139) // slate-500
-        doc.text(item.label, x + 4, yPos + 8)
+        doc.text(turkishToAscii(item.label), x + 4, yPos + 8)
 
         // Value
         doc.setFontSize(12)
-        doc.setFont("Roboto", "bold")
+        doc.setFont("helvetica", "bold")
 
         // Color mapping
         if (item.color === "green") doc.setTextColor(22, 163, 74)
@@ -89,7 +94,7 @@ export const generatePDF = async (data: ReportData) => {
         else if (item.color === "blue") doc.setTextColor(37, 99, 235)
         else doc.setTextColor(15, 23, 42) // slate-900
 
-        doc.text(item.value, x + 4, yPos + 18)
+        doc.text(turkishToAscii(item.value), x + 4, yPos + 18)
     })
 
     yPos += cardHeight + 15
@@ -97,24 +102,24 @@ export const generatePDF = async (data: ReportData) => {
     // Detailed Data Table
     doc.setTextColor(15, 23, 42)
     doc.setFontSize(14)
-    doc.setFont("Roboto", "bold")
-    doc.text("Detaylı Hareketler", 15, yPos)
+    doc.setFont("helvetica", "bold")
+    doc.text(turkishToAscii("Detaylı Hareketler"), 15, yPos)
     yPos += 5
 
     autoTable(doc, {
         startY: yPos,
-        head: [data.tableHeaders],
-        body: data.tableData,
+        head: [data.tableHeaders.map(h => turkishToAscii(h))],
+        body: data.tableData.map(row => row.map(cell => turkishToAscii(String(cell)))),
         theme: 'grid',
         headStyles: {
             fillColor: [2, 16, 36],
             textColor: [255, 255, 255],
-            font: "Roboto",
+            font: "helvetica",
             fontStyle: 'bold',
             halign: 'center'
         },
         bodyStyles: {
-            font: "Roboto",
+            font: "helvetica",
             fontSize: 9,
             textColor: [51, 65, 85], // slate-700
             cellPadding: 3
@@ -129,7 +134,7 @@ export const generatePDF = async (data: ReportData) => {
             fillColor: [241, 245, 249] // slate-100
         },
         styles: {
-            font: "Roboto" // Ensure font is applied to table
+            font: "helvetica" // Ensure font is applied to table
         }
     })
 
@@ -141,7 +146,7 @@ export const generatePDF = async (data: ReportData) => {
         doc.setTextColor(148, 163, 184) // slate-400
         doc.setFont("Roboto", "normal")
         doc.text(
-            `Sayfa ${i} / ${pageCount} - İYS Sünger ve Malzemecilik - ${format(new Date(), "dd.MM.yyyy HH:mm")}`,
+            turkishToAscii(`Sayfa ${i} / ${pageCount} - İYS Sünger ve Malzemecilik - ${format(new Date(), "dd.MM.yyyy HH:mm")}`),
             105,
             290,
             { align: "center" }

@@ -19,12 +19,26 @@ const COLORS = [
 ]
 
 export function StockDistributionChart({ stockSummary }: StockDistributionChartProps) {
-  const chartData = stockSummary
+  // Group small values into "Others"
+  const totalStock = stockSummary.reduce((sum, item) => sum + item.current_stock, 0)
+
+  let chartData = stockSummary
     .filter(item => item.current_stock > 0)
-    .map(item => ({
-      name: item.name,
-      value: item.current_stock
-    }))
+    .sort((a, b) => b.current_stock - a.current_stock)
+
+  // If we have many items, group the smaller ones
+  if (chartData.length > 6) {
+    const mainItems = chartData.slice(0, 5)
+    const otherItems = chartData.slice(5)
+    const otherTotal = otherItems.reduce((sum, item) => sum + item.current_stock, 0)
+
+    chartData = [
+      ...mainItems.map(item => ({ name: item.name, value: item.current_stock })),
+      { name: "Diğer", value: otherTotal }
+    ]
+  } else {
+    chartData = chartData.map(item => ({ name: item.name, value: item.current_stock }))
+  }
 
   if (chartData.length === 0) {
     return (
