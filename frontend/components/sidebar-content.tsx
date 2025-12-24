@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useState, useEffect } from "react"
@@ -11,7 +12,9 @@ import {
     ChevronLeft,
     ChevronRight,
     Save,
-    X
+    X,
+    ShieldCheck,
+    User
 } from "lucide-react"
 import { Dialog, DialogContent } from "@/components/ui/dialog"
 import { cn } from "@/lib/utils"
@@ -123,11 +126,17 @@ export function SidebarContent({
                 style={style}
             >
                 <div className="p-[30px_20px] text-center">
-                    <img
-                        src="https://via.placeholder.com/80"
-                        className="w-20 h-20 rounded-full border-[3px] border-[#C1E8FF] mb-2.5 mx-auto"
-                        alt="Kullanıcı Resmi"
-                    />
+                    <div className="w-20 h-20 rounded-full border-[3px] border-[#C1E8FF] mb-2.5 mx-auto flex items-center justify-center bg-gradient-to-br from-[#021024] to-[#052659] shadow-lg overflow-hidden relative group">
+                        {user?.role === 'admin' ? (
+                            <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-amber-500/20 to-orange-600/20">
+                                <ShieldCheck className="w-10 h-10 text-amber-400 drop-shadow-[0_0_8px_rgba(251,191,36,0.5)]" />
+                            </div>
+                        ) : (
+                            <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-blue-500/20 to-cyan-600/20">
+                                <User className="w-10 h-10 text-cyan-400 drop-shadow-[0_0_8px_rgba(34,211,238,0.5)]" />
+                            </div>
+                        )}
+                    </div>
                     <h3 className="font-bold text-lg">{user?.username?.toUpperCase() || "KULLANICI ADI"}</h3>
                     <p className="text-sm opacity-80">{user?.username || "kullanıcı@example.com"}</p>
                 </div>

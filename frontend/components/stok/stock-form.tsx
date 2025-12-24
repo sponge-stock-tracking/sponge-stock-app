@@ -93,12 +93,12 @@ export function StockForm({ type, sungerler, stokDurumlari, onSubmit }: StockFor
               onValueChange={(val) => setSpongeId(Number(val))}
               disabled={isSubmitting}
             >
-              <SelectTrigger id="sunger">
+              <SelectTrigger id="sunger" className="text-white bg-black/20 border-white/10">
                 <SelectValue placeholder="Sünger türü seçin" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="bg-[#021024] border-white/10 text-white">
                 {sungerler?.map((sunger) => (
-                  <SelectItem key={sunger.id} value={sunger.id.toString()}>
+                  <SelectItem key={sunger.id} value={sunger.id.toString()} className="focus:bg-white/10 focus:text-white">
                     {sunger.name} ({sunger.density} kg/m³)
                   </SelectItem>
                 ))}
@@ -135,6 +135,7 @@ export function StockForm({ type, sungerler, stokDurumlari, onSubmit }: StockFor
               value={quantity}
               onChange={(e) => setQuantity(e.target.value)}
               disabled={isSubmitting}
+              className="text-white bg-black/20 border-white/10 placeholder:text-white/50"
             />
             {selectedSponge && (
               <p className="text-sm text-muted-foreground">Birim: {selectedSponge.unit}</p>
@@ -156,6 +157,7 @@ export function StockForm({ type, sungerler, stokDurumlari, onSubmit }: StockFor
               onChange={(e) => setNote(e.target.value)}
               rows={3}
               disabled={isSubmitting}
+              className="text-white bg-black/20 border-white/10 placeholder:text-white/50"
             />
           </div>
 
